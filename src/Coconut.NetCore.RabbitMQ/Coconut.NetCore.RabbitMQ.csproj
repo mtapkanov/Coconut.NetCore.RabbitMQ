@@ -2,6 +2,13 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
+        <PackageVersion>0.0.1</PackageVersion>
+        <Title>Coconut.NetCore.RabbitMQ</Title>
+        <Description>RabbitMQ is easy</Description>
+        <Copyright>MTapkanov</Copyright>
+        <PackageLicenseUrl>MIT 2.0</PackageLicenseUrl>
+        <PackageTags>RabbitMq</PackageTags>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     </PropertyGroup>
 
 </Project>
