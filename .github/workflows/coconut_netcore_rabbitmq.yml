@@ -24,13 +24,7 @@ jobs:
         
       - name: Change Version
         run: sed -i -e 's/0.0.0.0/${{ env.VERSION_BY_TAG }}/g' src/${{ env.APPLICATION_NAME }}/${{ env.APPLICATION_NAME }}.csproj
-        
-      - name: Change Version Core
-        run: sed -i -e 's/0.0.0.0/${{ env.VERSION_BY_TAG }}/g' src/${{ env.APPLICATION_NAME }}.Core/${{ env.APPLICATION_NAME }}.Core.csproj
-      
-      - name: Change Version Metrics
-        run: sed -i -e 's/0.0.0.0/${{ env.VERSION_BY_TAG }}/g' src/${{ env.APPLICATION_NAME }}.Metrics/${{ env.APPLICATION_NAME }}.Metrics.csproj
-      
+
       - name: Build
         run: dotnet build ${{ env.APPLICATION_NAME }}.sln --configuration Release
       
@@ -41,20 +35,6 @@ jobs:
         uses: rohith/publish-nuget@v2
         with:
           PROJECT_FILE_PATH: src/${{ env.APPLICATION_NAME }}/${{ env.APPLICATION_NAME }}.csproj
-          VERSION_STATIC: ${{ env.VERSION_BY_TAG }}
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-
-      - name: Publish ${{ env.APPLICATION_NAME }}.Core
-        uses: rohith/publish-nuget@v2
-        with:
-          PROJECT_FILE_PATH: src/${{ env.APPLICATION_NAME }}.Core/${{ env.APPLICATION_NAME }}.Core.csproj
-          VERSION_STATIC: ${{ env.VERSION_BY_TAG }}
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-
-      - name: Publish ${{ env.APPLICATION_NAME }}.Metrics
-        uses: rohith/publish-nuget@v2
-        with:
-          PROJECT_FILE_PATH: src/${{ env.APPLICATION_NAME }}.Metrics/${{ env.APPLICATION_NAME }}.Metrics.csproj
           VERSION_STATIC: ${{ env.VERSION_BY_TAG }}
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
           
