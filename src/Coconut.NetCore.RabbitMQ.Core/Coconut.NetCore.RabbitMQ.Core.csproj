@@ -9,9 +9,10 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <PackageVersion>0.0.1</PackageVersion>
-        <Title>Coconut.NetCore.RabbitMQ.Metrics</Title>
+        <Title>Coconut.NetCore.RabbitMQ.Core</Title>
+        <Copyright>MTapkanov</Copyright>
         <PackageLicenseUrl>MIT</PackageLicenseUrl>
-        <PackageTags>RabbitMq, Metrics</PackageTags>
+        <PackageTags>RabbitMq</PackageTags>
     </PropertyGroup>
 
 </Project>

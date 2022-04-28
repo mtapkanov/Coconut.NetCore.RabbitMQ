@@ -15,18 +15,30 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.102
+    
     - name: Install dependencies
       run: dotnet restore Coconut.NetCore.RabbitMQ.sln
+    
     - name: Build
-      run: dotnet build Coconut.NetCore.RabbitMQ.sln --configuration Release --no-restore
+      run: dotnet build Coconut.NetCore.RabbitMQ.sln --configuration Release
+    
     - name: Tests
       run: dotnet test tests/Coconut.NetCore.RabbitMQ.Tests/Coconut.NetCore.RabbitMQ.Tests.csproj
+    
     - name: Publish Coconut.NetCore.RabbitMQ
       uses: rohith/publish-nuget@v2
       with:
         PROJECT_FILE_PATH: src/Coconut.NetCore.RabbitMQ/Coconut.NetCore.RabbitMQ.csproj
         VERSION_REGEX: ^\s*<PackageVersion>(.*)<\/PackageVersion>\s*$
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+        
+    - name: Publish Coconut.NetCore.RabbitMQ.Core
+      uses: rohith/publish-nuget@v2
+      with:
+        PROJECT_FILE_PATH: src/Coconut.NetCore.RabbitMQ.Core/Coconut.NetCore.RabbitMQ.Core.csproj
+        VERSION_REGEX: ^\s*<PackageVersion>(.*)<\/PackageVersion>\s*$
+        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+    
     - name: Publish Coconut.NetCore.RabbitMQ.Metrics
       uses: rohith/publish-nuget@v2
       with:

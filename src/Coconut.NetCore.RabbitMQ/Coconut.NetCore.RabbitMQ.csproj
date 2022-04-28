@@ -2,13 +2,14 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <PackageVersion>0.0.1</PackageVersion>
         <Title>Coconut.NetCore.RabbitMQ</Title>
-        <Description>RabbitMQ is easy</Description>
         <Copyright>MTapkanov</Copyright>
         <PackageLicenseUrl>MIT</PackageLicenseUrl>
         <PackageTags>RabbitMq</PackageTags>
