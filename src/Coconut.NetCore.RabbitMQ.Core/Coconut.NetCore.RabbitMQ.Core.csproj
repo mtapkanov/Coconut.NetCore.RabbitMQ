@@ -8,7 +8,7 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
-        <PackageVersion>0.0.3</PackageVersion>
+        <PackageVersion>0.0.0.0</PackageVersion>
         <Title>Coconut.NetCore.RabbitMQ.Core</Title>
         <PackageLicenseUrl>MIT</PackageLicenseUrl>
         <PackageTags>RabbitMq</PackageTags>
