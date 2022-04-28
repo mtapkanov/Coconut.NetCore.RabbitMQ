@@ -8,7 +8,7 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
-        <PackageVersion>0.0.1</PackageVersion>
+        <PackageVersion>0.0.2</PackageVersion>
         <Title>Coconut.NetCore.RabbitMQ</Title>
         <Copyright>MTapkanov</Copyright>
         <PackageLicenseUrl>MIT</PackageLicenseUrl>
@@ -16,11 +16,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Coconut.NetCore.RabbitMQ.Core\Coconut.NetCore.RabbitMQ.Core.csproj" />
+      <PackageReference Include="RabbitMQ.Client" Version="6.2.4" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="RabbitMQ.Client" Version="6.2.4" />
+      <ProjectReference Include="..\Coconut.NetCore.RabbitMQ.Core\Coconut.NetCore.RabbitMQ.Core.csproj" />
     </ItemGroup>
 
 </Project>
