@@ -15,4 +15,12 @@
         <PackageTags>RabbitMq</PackageTags>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Coconut.NetCore.RabbitMQ.Core\Coconut.NetCore.RabbitMQ.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="RabbitMQ.Client" Version="6.2.4" />
+    </ItemGroup>
+
 </Project>
