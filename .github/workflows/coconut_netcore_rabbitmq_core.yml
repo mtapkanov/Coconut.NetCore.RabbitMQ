@@ -1,0 +1,40 @@
+name: Coconut.NetCore.RabbitMQ.Core
+env:
+  ROOT_NAME: "Coconut.NetCore.RabbitMQ"
+  PROJECT_NAME: "Coconut.NetCore.RabbitMQ.Core"
+  VERSION_BY_TAG: "${{ github.ref_name }}"
+on:
+  create:
+    tags:
+      - v*.*.*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.102
+        
+      - name: Install dependencies
+        run: dotnet restore ${{ env.ROOT_NAME }}.sln
+        
+      - name: Change Version
+        run: sed -i -e 's/0.0.0.0/${{ env.VERSION_BY_TAG }}/g' src/${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.csproj
+
+      - name: Build
+        run: dotnet build ${{ env.ROOT_NAME }}.sln --configuration Release
+      
+      - name: Tests
+        run: dotnet test tests/${{ env.PROJECT_NAME }}.Tests/${{ env.PROJECT_NAME }}.Tests.csproj
+
+      - name: Publish ${{ env.PROJECT_NAME }}
+        uses: rohith/publish-nuget@v2
+        with:
+          PROJECT_FILE_PATH: src/${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.csproj
+          VERSION_STATIC: ${{ env.VERSION_BY_TAG }}
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+          
