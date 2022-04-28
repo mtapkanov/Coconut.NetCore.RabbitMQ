@@ -350,3 +350,4 @@ MigrationBackup/
 .ionide/
 *.DS_Store
 .idea/
+/nupkg/Coconut.NetCore.RabbitMQ.nuspec

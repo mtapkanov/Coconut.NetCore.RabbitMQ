@@ -1,4 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
@@ -6,9 +10,8 @@
         <Title>Coconut.NetCore.RabbitMQ</Title>
         <Description>RabbitMQ is easy</Description>
         <Copyright>MTapkanov</Copyright>
-        <PackageLicenseUrl>MIT 2.0</PackageLicenseUrl>
+        <PackageLicenseUrl>MIT</PackageLicenseUrl>
         <PackageTags>RabbitMq</PackageTags>
-        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     </PropertyGroup>
 
 </Project>
