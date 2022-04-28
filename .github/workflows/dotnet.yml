@@ -1,0 +1,28 @@
+name: .NET Core
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.102
+    - name: Install dependencies
+      run: dotnet restore src/Coconut.NetCore.RabbitMQ.sln
+    - name: Build
+      run: dotnet build src/Coconut.NetCore.RabbitMQ.sln --configuration Release --no-restore 
+    - name: Tests
+      run: dotnet test tests/Coconut.NetCore.RabbitMQ.Tests/Coconut.NetCore.RabbitMQ.Tests.csproj
+    - name: Publish Coconut.NetCore.RabbitMQ
+      uses: brandedoutcast/publish-nuget@v2.5.2
+      with:
+          PROJECT_FILE_PATH: src/Coconut.NetCore.RabbitMQ/Coconut.NetCore.RabbitMQ.csproj
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
