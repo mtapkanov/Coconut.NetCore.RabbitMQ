@@ -1,49 +1,57 @@
 name: Coconut.NetCore.RabbitMQ
 env: 
   APPLICATION_NAME: "Coconut.NetCore.RabbitMQ"
+  VERSION_BY_TAG: "${{ github.ref_name }}"
 
 on:
-  push:
-    branches:
-      [ main ]
+  create:
+    tags:
+      - v*.*.*
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 5.0.102
-    
-    - name: Install dependencies
-      run: dotnet restore ${{ env.APPLICATION_NAME }}.sln
-    
-    - name: Build
-      run: dotnet build ${{ env.APPLICATION_NAME }}.sln --configuration Release
-    
-    - name: Tests
-      run: dotnet test tests/${{ env.APPLICATION_NAME }}.Tests/${{ env.APPLICATION_NAME }}.Tests.csproj
-    
-    - name: Publish ${{ env.APPLICATION_NAME }}
-      uses: rohith/publish-nuget@v2
-      with:
-        PROJECT_FILE_PATH: src/${{ env.APPLICATION_NAME }}/${{ env.APPLICATION_NAME }}.csproj
-        VERSION_REGEX: ^\s*<PackageVersion>(.*)<\/PackageVersion>\s*$
-        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+      - uses: actions/checkout@v2
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.102
         
-    - name: Publish ${{ env.APPLICATION_NAME }}.Core
-      uses: rohith/publish-nuget@v2
-      with:
-        PROJECT_FILE_PATH: src/${{ env.APPLICATION_NAME }}.Core/${{ env.APPLICATION_NAME }}.Core.csproj
-        VERSION_REGEX: ^\s*<PackageVersion>(.*)<\/PackageVersion>\s*$
-        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-    
-    - name: Publish ${{ env.APPLICATION_NAME }}.Metrics
-      uses: rohith/publish-nuget@v2
-      with:
-        PROJECT_FILE_PATH: src/${{ env.APPLICATION_NAME }}.Metrics/${{ env.APPLICATION_NAME }}.Metrics.csproj
-        VERSION_REGEX: ^\s*<PackageVersion>(.*)<\/PackageVersion>\s*$
-        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+      - name: Install dependencies
+        run: dotnet restore ${{ env.APPLICATION_NAME }}.sln
+        
+      -name: change version
+        run: 
+          sed -i -e 's/0.0.0.0/${{ env.VERSION_BY_TAG }}/g' src/${{ env.APPLICATION_NAME }}/${{ env.APPLICATION_NAME }}.csproj
+          sed -i -e 's/0.0.0.0/${{ env.VERSION_BY_TAG }}/g' src/${{ env.APPLICATION_NAME }}.Core/${{ env.APPLICATION_NAME }}.Core.csproj
+          sed -i -e 's/0.0.0.0/${{ env.VERSION_BY_TAG }}/g' src/${{ env.APPLICATION_NAME }}.Metrics/${{ env.APPLICATION_NAME }}.Metrics.csproj
+      
+      - name: Build
+        run: dotnet build ${{ env.APPLICATION_NAME }}.sln --configuration Release
+      
+      - name: Tests
+        run: dotnet test tests/${{ env.APPLICATION_NAME }}.Tests/${{ env.APPLICATION_NAME }}.Tests.csproj
+
+      - name: Publish ${{ env.APPLICATION_NAME }}
+        uses: rohith/publish-nuget@v2
+        with:
+          PROJECT_FILE_PATH: src/${{ env.APPLICATION_NAME }}/${{ env.APPLICATION_NAME }}.csproj
+          VERSION_STATIC: ${{ env.VERSION_BY_TAG }}
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+
+      - name: Publish ${{ env.APPLICATION_NAME }}.Core
+        uses: rohith/publish-nuget@v2
+        with:
+          PROJECT_FILE_PATH: src/${{ env.APPLICATION_NAME }}.Core/${{ env.APPLICATION_NAME }}.Core.csproj
+          VERSION_STATIC: ${{ env.VERSION_BY_TAG }}
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+
+      - name: Publish ${{ env.APPLICATION_NAME }}.Metrics
+        uses: rohith/publish-nuget@v2
+        with:
+          PROJECT_FILE_PATH: src/${{ env.APPLICATION_NAME }}.Metrics/${{ env.APPLICATION_NAME }}.Metrics.csproj
+          VERSION_STATIC: ${{ env.VERSION_BY_TAG }}
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+          
