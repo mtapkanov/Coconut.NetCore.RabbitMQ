@@ -22,7 +22,8 @@ jobs:
     - name: Tests
       run: dotnet test tests/Coconut.NetCore.RabbitMQ.Tests/Coconut.NetCore.RabbitMQ.Tests.csproj
     - name: Publish Coconut.NetCore.RabbitMQ
-      uses: brandedoutcast/publish-nuget@v2.5.2
+      id: publish_nuget
+      uses: rohith/publish-nuget@v2
       with:
-          PROJECT_FILE_PATH: src/Coconut.NetCore.RabbitMQ/Coconut.NetCore.RabbitMQ.csproj
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+        PROJECT_FILE_PATH: src/Coconut.NetCore.RabbitMQ/Coconut.NetCore.RabbitMQ.csproj
+        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
