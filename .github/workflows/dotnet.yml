@@ -26,4 +26,5 @@ jobs:
       uses: rohith/publish-nuget@v2
       with:
         PROJECT_FILE_PATH: src/Coconut.NetCore.RabbitMQ/Coconut.NetCore.RabbitMQ.csproj
+        VERSION_REGEX: ^\s*<ProjectVersion>(.*)<\/ProjectVersion>\s*$
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
