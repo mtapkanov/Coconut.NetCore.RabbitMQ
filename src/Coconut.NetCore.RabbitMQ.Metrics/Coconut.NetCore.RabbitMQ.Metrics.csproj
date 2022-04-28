@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <PackageVersion>0.0.1</PackageVersion>
+        <Title>Coconut.NetCore.RabbitMQ.Metrics</Title>
+        <Description>Metrics for $(ProjectName)</Description>
+        <Copyright>MTapkanov</Copyright>
+        <PackageLicenseUrl>MIT</PackageLicenseUrl>
+        <PackageTags>RabbitMq, Metrics</PackageTags>
+    </PropertyGroup>
+
+</Project>
