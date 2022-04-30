@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using Coconut.NetCore.RabbitMQ.Configuration;
+using Coconut.NetCore.RabbitMQ.Configuration.Options;
 using Microsoft.Extensions.Logging;
 using Polly;
 using RabbitMQ.Client;

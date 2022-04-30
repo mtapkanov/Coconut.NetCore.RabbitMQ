@@ -1,5 +1,6 @@
 ﻿using System;
 using Coconut.NetCore.RabbitMQ.Configuration;
+using Coconut.NetCore.RabbitMQ.Configuration.Options;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Coconut.NetCore.RabbitMQ.Configuration;
+using Coconut.NetCore.RabbitMQ.Configuration.Options;
 using Coconut.NetCore.RabbitMQ.Core.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

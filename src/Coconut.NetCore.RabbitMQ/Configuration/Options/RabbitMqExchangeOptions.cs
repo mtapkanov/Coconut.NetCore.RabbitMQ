@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Coconut.NetCore.RabbitMQ.Configuration.Settings;
 
-namespace Coconut.NetCore.RabbitMQ.Configuration
+namespace Coconut.NetCore.RabbitMQ.Configuration.Options
 {
     /// <summary>
     ///     RabbitMQ exchange options.

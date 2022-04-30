@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Coconut.NetCore.RabbitMQ.Configuration
+namespace Coconut.NetCore.RabbitMQ.Configuration.Settings
 {
     /// <summary>
     ///     RabbitMQ queue binding configuration.

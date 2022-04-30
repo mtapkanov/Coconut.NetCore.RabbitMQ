@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Coconut.NetCore.RabbitMQ.Configuration;
+using Coconut.NetCore.RabbitMQ.Configuration.Options;
 using Coconut.NetCore.RabbitMQ.Core.Events;
 using Coconut.NetCore.RabbitMQ.Processing;
 using Coconut.NetCore.RabbitMQ.Processing.Internal;

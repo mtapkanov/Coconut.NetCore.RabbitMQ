@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Coconut.NetCore.RabbitMQ.Configuration.Options;
+using Coconut.NetCore.RabbitMQ.Configuration.Settings;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Coconut.NetCore.RabbitMQ.Configuration
+namespace Coconut.NetCore.RabbitMQ.Configuration.Builders
 {
     /// <summary>
     ///     RabbitMQ unit options builder.

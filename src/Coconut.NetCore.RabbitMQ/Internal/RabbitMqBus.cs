@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using Coconut.NetCore.RabbitMQ.Configuration;
+using Coconut.NetCore.RabbitMQ.Configuration.Options;
 using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
 

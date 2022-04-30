@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Coconut.NetCore.RabbitMQ.Configuration
+namespace Coconut.NetCore.RabbitMQ.Configuration.Options
 {
     /// <summary>
     ///     RabbitMQ exchange publish options.

@@ -1,6 +1,7 @@
 ﻿using System;
+using Coconut.NetCore.RabbitMQ.Configuration.Settings;
 
-namespace Coconut.NetCore.RabbitMQ.Configuration
+namespace Coconut.NetCore.RabbitMQ.Configuration.Options
 {
     /// <summary>
     ///     RabbitMQ queue options.

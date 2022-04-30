@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Coconut.NetCore.RabbitMQ.Configuration.Options;
+using Coconut.NetCore.RabbitMQ.Configuration.Settings;
 using Coconut.NetCore.RabbitMQ.Processing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Coconut.NetCore.RabbitMQ.Configuration
+namespace Coconut.NetCore.RabbitMQ.Configuration.Builders
 {
     /// <summary>
     ///     RabbitMQ exchange options builder.

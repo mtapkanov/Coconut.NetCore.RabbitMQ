@@ -1,4 +1,4 @@
-﻿namespace Coconut.NetCore.RabbitMQ.Configuration
+﻿namespace Coconut.NetCore.RabbitMQ.Configuration.Builders
 {
     /// <summary>
     ///     Represents configuration builder for options.
