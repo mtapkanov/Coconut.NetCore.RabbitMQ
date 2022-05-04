@@ -19,19 +19,19 @@ jobs:
         with:
           dotnet-version: 5.0.102
         
-      - name: Install dependencies
+      - name: Restore project
         run: dotnet restore ${{ env.ROOT_NAME }}.sln
         
-      - name: Change Version
-        run: sed -i -e 's/0.0.0.0/${{ env.VERSION_BY_TAG }}/g' src/${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.csproj
-
-      - name: Build
-        run: dotnet build ${{ env.ROOT_NAME }}.sln --configuration Release
+      - name: Build project
+        run: dotnet build ${{ env.ROOT_NAME }}.sln --no-restore --configuration Release
+        
+      - name: Create nuspec file.
+        run: dotnet publish -p:PackageVersion=${{ env.VERSION_BY_TAG }}
       
-      - name: Tests
-        run: dotnet test tests/${{ env.PROJECT_NAME }}.Tests/${{ env.PROJECT_NAME }}.Tests.csproj
+      - name: Run tests
+        run: dotnet test tests/${{ env.PROJECT_NAME }}.Tests/${{ env.PROJECT_NAME }}.Tests.csproj --no-build
 
-      - name: Publish ${{ env.PROJECT_NAME }}
+      - name: Publish to github ${{ env.PROJECT_NAME }}
         uses: rohith/publish-nuget@v2
         with:
           PROJECT_FILE_PATH: src/${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.csproj
