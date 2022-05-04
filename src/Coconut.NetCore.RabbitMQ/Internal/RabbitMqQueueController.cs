@@ -139,8 +139,7 @@ namespace Coconut.NetCore.RabbitMQ.Internal
                     sleepDurationProvider: WaitDurationProvider.WaitUpTo30Seconds,
                     onRetry: (exception, timespan) =>
                     {
-                        _logger.LogError(exception,
-                            $"RabbitMQ consumption failed. Retry in {timespan:c}. Queue: {queue}");
+                        _logger.LogError(exception, $"RabbitMQ consumption failed. Retry in {timespan:c}. Queue: {queue}");
                     })
                 .Execute(token =>
                     {

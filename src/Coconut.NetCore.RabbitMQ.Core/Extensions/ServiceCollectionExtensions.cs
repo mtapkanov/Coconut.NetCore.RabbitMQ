@@ -3,6 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Coconut.NetCore.RabbitMQ.Core.Extensions
 {
+    /// <summary>
+    ///     RabbitMQ service collection extension methods.
+    /// </summary>
     public static class ServiceCollectionExtensions
     {
         /// <summary>

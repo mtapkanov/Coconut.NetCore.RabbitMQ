@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 namespace Coconut.NetCore.RabbitMQ.Metrics.Extensions
 {
     /// <summary>
-    ///     RabbitMQ service collection extension methods.
+    ///     RabbitMQ metrics service collection extension methods.
     /// </summary>
     public static class ServiceCollectionExtensions
     {

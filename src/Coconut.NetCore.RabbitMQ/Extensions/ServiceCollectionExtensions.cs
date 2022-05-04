@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Coconut.NetCore.RabbitMQ.Configuration;
 using Coconut.NetCore.RabbitMQ.Configuration.Builders;
 using Coconut.NetCore.RabbitMQ.Internal;
 using Microsoft.Extensions.DependencyInjection;
