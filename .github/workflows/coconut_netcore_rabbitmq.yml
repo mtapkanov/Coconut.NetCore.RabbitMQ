@@ -32,9 +32,5 @@ jobs:
         run: dotnet test tests/${{ env.PROJECT_NAME }}.Tests/${{ env.PROJECT_NAME }}.Tests.csproj --no-build
 
       - name: Publish to github ${{ env.PROJECT_NAME }}
-        uses: rohith/publish-nuget@v2
-        with:
-          PROJECT_FILE_PATH: src/${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.csproj
-          VERSION_STATIC: ${{ env.VERSION_BY_TAG }}
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-          
+        run: dotnet nuget push ./src/${{ env.PROJECT_NAME }}/bin/Debug/${{ env.PROJECT_NAME }}.${{ env.VERSION_BY_TAG }}.nupkg -s https://api.nuget.org/v3/index.json -k ${{secrets.NUGET_API_KEY}}
+        
