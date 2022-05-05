@@ -36,7 +36,7 @@ namespace Coconut.NetCore.RabbitMQ.Configuration.Builders
         /// <typeparam name="TMessage">The type of message that will be distributed through the exchange.</typeparam>
         /// <typeparam name="TMessageSerializer">Type of message serializer.</typeparam>
         public RabbitMqExchangeOptionsBuilder AcceptMessages<TMessage, TMessageSerializer>(Func<TMessage, string> routingKeyProvider = null)
-            where TMessageSerializer : IMessageSerializer<TMessage>
+            where TMessageSerializer : IMessageSerializer
         {
             Func<object, string> getRoutingKey = routingKeyProvider is null
                 ? (object message) => string.Empty
@@ -52,7 +52,8 @@ namespace Coconut.NetCore.RabbitMQ.Configuration.Builders
         /// <inheritdoc />
         public RabbitMqExchangeOptions Build()
         {
-            if (!_acceptedPublishOptions.Any()) throw new NotSupportedException($"Message types must be defined in {nameof(RabbitMqExchangeOptionsBuilder)}");
+            if (!_acceptedPublishOptions.Any()) 
+                throw new NotSupportedException($"Message types must be defined in {nameof(RabbitMqExchangeOptionsBuilder)}");
 
             return new RabbitMqExchangeOptions(_exchangeSettings, _acceptedPublishOptions);
         }

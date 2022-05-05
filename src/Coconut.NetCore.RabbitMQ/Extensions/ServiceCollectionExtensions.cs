@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
-namespace Coconut.NetCore.RabbitMQ
+namespace Coconut.NetCore.RabbitMQ.Extensions
 {
     /// <summary>
     ///     RabbitMQ service collection extension methods.

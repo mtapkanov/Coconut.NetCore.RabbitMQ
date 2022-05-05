@@ -29,16 +29,12 @@ namespace Coconut.NetCore.RabbitMQ.Internal
 
             if (options.RabbitMqExchangeOptions.Any())
                 foreach (var exchangeOptions in options.RabbitMqExchangeOptions)
-                {
                     DeclareExchange(exchangeOptions);
-                }
 
             if (options.RabbitMqQueueOptions.Any())
                 foreach (var queueOptions in options.RabbitMqQueueOptions)
-                {
-                    var queueController = _factory.CreateQueueController(queueOptions, Connection);
-                    queueController.Run(cancellationToken);
-                }
+                    _factory.CreateQueueController(queueOptions, Connection)
+                        .Run(cancellationToken);
         }
 
         public void Stop()

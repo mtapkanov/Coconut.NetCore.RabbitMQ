@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
-using Coconut.NetCore.RabbitMQ.Configuration;
 using Coconut.NetCore.RabbitMQ.Configuration.Options;
 using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
@@ -14,7 +14,7 @@ namespace Coconut.NetCore.RabbitMQ.Internal
         private readonly RabbitMqFactory _factory;
         private readonly List<RabbitMqUnit> _rabbitMqUnits = new();
 
-        private readonly Dictionary<string, List<IRabbitMqPublishController>> _publishControllers = new();
+        private readonly Dictionary<string, List<IRabbitMqPublisher>> _publishControllers = new();
 
         public RabbitMqBus(IServiceProvider serviceProvider, RabbitMqFactory factory)
         {
@@ -44,31 +44,31 @@ namespace Coconut.NetCore.RabbitMQ.Internal
         public void Publish<TMessage>(TMessage message)
         {
             var messageType = typeof(TMessage).FullName;
-
-            if (!_publishControllers.ContainsKey(messageType))
+            
+            if (!_publishControllers.TryGetValue(messageType, out var publishers))
                 throw new NotSupportedException($"Message type {nameof(TMessage)} not configured to publishing in RabbitMQ bus.");
 
-            _publishControllers[messageType]
-                .ForEach(publishController => ((RabbitMqPublishController<TMessage>)publishController).Publish(message));
+            foreach (var publisher in publishers)
+                publisher.Publish(message);
         }
 
         private void StartPublishControllers(RabbitMqOptions rabbitMqOptions, IConnection connection)
         {
-            foreach (var exchangeOptions in rabbitMqOptions.RabbitMqExchangeOptions)
+            foreach (var (exchangeName, publishOptions) in GetPublishOptions(rabbitMqOptions))
             {
-                foreach (var publishOptions in exchangeOptions.AcceptedPublishOptions)
-                {
-                    var publishController = _factory.CreatePublishController(publishOptions, connection, exchangeOptions.ExchangeSettings.Name);
-                    publishController.Run();
+                var messageType = publishOptions.MessageType.FullName!;
+                var publisher = _factory.CreatePublisher(publishOptions, connection, exchangeName);
+                
+                if (!_publishControllers.ContainsKey(messageType))
+                    _publishControllers.Add(messageType, new List<IRabbitMqPublisher>());
 
-                    var messageType = publishOptions.MessageType.FullName;
-
-                    if (!_publishControllers.ContainsKey(messageType))
-                        _publishControllers.Add(messageType, new());
-
-                    _publishControllers[messageType].Add(publishController);
-                }
+                _publishControllers[messageType].Add(publisher);
             }
         }
+        
+        private static IEnumerable<(string exchangeName, RabbitMqPublishOptions publishOptions)> GetPublishOptions(RabbitMqOptions rabbitMqOptions) =>
+            rabbitMqOptions.RabbitMqExchangeOptions
+                .SelectMany(exchangeOptions => exchangeOptions.AcceptedPublishOptions
+                    .Select(publishOptions => (exchangeOptions.ExchangeSettings.Name, publishOptions)));
     }
 }

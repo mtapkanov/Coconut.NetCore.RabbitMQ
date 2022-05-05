@@ -9,14 +9,14 @@
             MetricValueType.Integer,
             MetricChangeTrackingPeriod.PerMinute);
 
-        public void IncrementAcknowledgedMessagesCount(string exchange, string routing_key, int increment = 1)
+        public void IncrementAcknowledgedMessagesCount(string exchange, string routingKey, int increment = 1)
         {
-            _rabbitMqMessagesCountTotal.WithLabels($"{exchange}.{routing_key}", true).Inc(increment);
+            _rabbitMqMessagesCountTotal.WithLabels($"{exchange}.{routingKey}", true).Inc(increment);
         }
 
-        public void IncrementRejectedMessagesCount(string exchange, string routing_key, int increment = 1)
+        public void IncrementRejectedMessagesCount(string exchange, string routingKey, int increment = 1)
         {
-            _rabbitMqMessagesCountTotal.WithLabels($"{exchange}.{routing_key}", false).Inc(increment);
+            _rabbitMqMessagesCountTotal.WithLabels($"{exchange}.{routingKey}", false).Inc(increment);
         }
     }
 }
