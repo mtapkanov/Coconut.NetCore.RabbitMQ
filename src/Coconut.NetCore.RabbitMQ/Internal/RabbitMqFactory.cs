@@ -19,15 +19,13 @@ namespace Coconut.NetCore.RabbitMQ.Internal
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         }
 
-        public IRabbitMqPublishController CreatePublishController(RabbitMqPublishOptions publishOptions, IConnection connection, string exchangeName)
-        {
-            Type controllerType = typeof(RabbitMqPublishController<>).MakeGenericType(publishOptions.MessageType);
-            return (IRabbitMqPublishController)Activator.CreateInstance(controllerType, _serviceProvider, connection, publishOptions, exchangeName, _loggerFactory);
-        }
+        public IRabbitMqPublisher CreatePublisher(RabbitMqPublishOptions publishOptions, IConnection connection, string exchangeName) =>
+            new RabbitMqPublisherFactory(_serviceProvider, connection, publishOptions, exchangeName, _loggerFactory)
+                .Create();
 
         public IRabbitMqQueueController CreateQueueController(RabbitMqQueueOptions queueOptions, IConnection connection)
         {
-            Type controllerType = typeof(RabbitMqQueueController<>).MakeGenericType(queueOptions.MessageType);
+            var controllerType = typeof(RabbitMqQueueController<>).MakeGenericType(queueOptions.MessageType);
             return (IRabbitMqQueueController)Activator.CreateInstance(controllerType, _serviceProvider, connection, queueOptions, _eventBus, _loggerFactory);
         }
     }

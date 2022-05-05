@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Coconut.NetCore.RabbitMQ.Core.Events;
 using RabbitMQ.Client.Events;
 
-namespace Coconut.NetCore.RabbitMQ.Events
+namespace Coconut.NetCore.RabbitMQ.Core.Events
 {
     /// <summary>
     ///     RabbitMQ message consumption event.

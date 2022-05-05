@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Coconut.NetCore.RabbitMQ.Events;
 using RabbitMQ.Client.Events;
 
 namespace Coconut.NetCore.RabbitMQ.Core.Events

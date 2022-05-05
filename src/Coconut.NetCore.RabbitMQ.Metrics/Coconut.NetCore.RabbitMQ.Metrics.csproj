@@ -15,9 +15,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Coconut.NetCore.RabbitMQ.Core" Version="0.2.6" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
       <PackageReference Include="prometheus-net" Version="6.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Coconut.NetCore.RabbitMQ.Core\Coconut.NetCore.RabbitMQ.Core.csproj" />
     </ItemGroup>
 
 </Project>

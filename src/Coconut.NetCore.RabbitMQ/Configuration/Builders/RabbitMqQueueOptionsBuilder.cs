@@ -59,8 +59,11 @@ namespace Coconut.NetCore.RabbitMQ.Configuration.Builders
         /// <inheritdoc />
         public RabbitMqQueueOptions Build()
         {
-            if (_deserializerType is null) throw new NotSupportedException($"Message deserializer must be defined in {nameof(RabbitMqQueueOptionsBuilder<TMessage>)}");
-            if (_consumerType is null) throw new NotSupportedException($"Message consumer must be defined in {nameof(RabbitMqQueueOptionsBuilder<TMessage>)}");
+            if (_deserializerType is null) 
+                throw new NotSupportedException($"Message deserializer must be defined in {nameof(RabbitMqQueueOptionsBuilder<TMessage>)}");
+            
+            if (_consumerType is null) 
+                throw new NotSupportedException($"Message consumer must be defined in {nameof(RabbitMqQueueOptionsBuilder<TMessage>)}");
 
             return new RabbitMqQueueOptions(_queueSettings, typeof(TMessage), _deserializerType, _consumerType);
         }
