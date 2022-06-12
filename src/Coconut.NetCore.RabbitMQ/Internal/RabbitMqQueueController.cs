@@ -15,7 +15,6 @@ using RabbitMQ.Client.Exceptions;
 
 namespace Coconut.NetCore.RabbitMQ.Internal
 {
-
     internal class RabbitMqQueueController : IRabbitMqQueueController
     {
         private readonly IServiceProvider _provider;
@@ -91,6 +90,7 @@ namespace Coconut.NetCore.RabbitMQ.Internal
 
                     if (context.Failed)
                         _logger.LogError($"Message consumption failed. Sending back to queue. Delivery tag: {basicEvent.DeliveryTag}; Exchange: {basicEvent.Exchange}; Routing key:{basicEvent.RoutingKey}");
+                    
                     else if (_logger.IsEnabled(LogLevel.Trace))
                         _logger.LogTrace($"Message consumption success. Removing from queue. Delivery tag: {basicEvent.DeliveryTag}; Exchange: {basicEvent.Exchange}; Routing key:{basicEvent.RoutingKey}");
 

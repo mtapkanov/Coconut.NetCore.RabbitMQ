@@ -25,15 +25,17 @@ namespace Coconut.NetCore.RabbitMQ.Extensions
         {
             services.TryAdd(new List<ServiceDescriptor>
             {
+                ServiceDescriptor.Singleton<IRabbitMqBusController, RabbitMqBusController>(),
                 ServiceDescriptor.Singleton<IHostedService, RabbitMqStarterHostedService>(),
                 ServiceDescriptor.Singleton<RabbitMqEventBus, RabbitMqEventBus>(),
-                ServiceDescriptor.Transient<RabbitMqUnit, RabbitMqUnit>(),
+                ServiceDescriptor.Singleton<PublisherCache, PublisherCache>(),
                 ServiceDescriptor.Singleton<IRabbitMqBus, RabbitMqBus>(),
+                ServiceDescriptor.Transient<RabbitMqUnit, RabbitMqUnit>(),
             });
 
             var options = new RabbitMqOptionsBuilder(services, uri);
             optionsAction(options);
-            services.AddTransient(provider => ((IBuilder<RabbitMqOptions>)options).Build());
+            services.AddTransient(_ => ((IBuilder<RabbitMqOptions>)options).Build());
 
             return services;
         }
