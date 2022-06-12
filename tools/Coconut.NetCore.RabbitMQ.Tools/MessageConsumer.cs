@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Coconut.NetCore.RabbitMQ.Processing;
-using Coconut.NetCore.RabbitMQ.Processing.Internal;
 
 namespace Coconut.NetCore.RabbitMQ.Tools
 {

@@ -52,7 +52,7 @@ namespace Coconut.NetCore.RabbitMQ.Internal
 
             if (declareSettings is null)
                 return;
-
+            
             channel.QueueDeclare(
                 _queueOptions.QueueSettings.Name,
                 declareSettings.Durable,
@@ -64,7 +64,7 @@ namespace Coconut.NetCore.RabbitMQ.Internal
                 channel.QueueBind(
                     _queueOptions.QueueSettings.Name,
                     bindingSetting.Exchange,
-                    bindingSetting.RoutingKey,
+                    bindingSetting.RoutingKey ?? string.Empty, 
                     bindingSetting.Arguments);
         }
 
