@@ -12,6 +12,6 @@ namespace Coconut.NetCore.RabbitMQ.Core.Handlers
         /// <summary>
         ///     Handles the RabbitMQ events.
         /// </summary>
-        Task Handle(IRabbitMqEvent @event, CancellationToken cancellationToken);
+        Task Handle(IRabbitMqEvent @event, CancellationToken cancellationToken = default);
     }
 }

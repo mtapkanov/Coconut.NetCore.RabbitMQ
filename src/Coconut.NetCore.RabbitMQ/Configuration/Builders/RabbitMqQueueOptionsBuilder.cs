@@ -2,6 +2,7 @@
 using Coconut.NetCore.RabbitMQ.Configuration.Options;
 using Coconut.NetCore.RabbitMQ.Configuration.Settings;
 using Coconut.NetCore.RabbitMQ.Processing;
+using Coconut.NetCore.RabbitMQ.Processing.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -48,7 +49,7 @@ namespace Coconut.NetCore.RabbitMQ.Configuration.Builders
         /// <typeparam name="TMessageConsumer">Type of message consumer.</typeparam>
         /// <param name="serviceLifetime">Specifies the lifetime of a consumer. Scoped by default.</param>
         public RabbitMqQueueOptionsBuilder<TMessage> UseConsumer<TMessageConsumer>(ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
-            where TMessageConsumer : IMessageConsumer<TMessage>
+            where TMessageConsumer : MessageConsumerBase<TMessage>
         {
             _consumerType = typeof(TMessageConsumer);
             _services.TryAdd(ServiceDescriptor.Describe(_consumerType, _consumerType, serviceLifetime));

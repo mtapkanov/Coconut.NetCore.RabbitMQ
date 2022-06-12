@@ -28,7 +28,7 @@ namespace Coconut.NetCore.RabbitMQ.Core.Events
         protected ConsumptionEventBase(BasicDeliverEventArgs basicEvent, Dictionary<string, object> data)
         {
             BasicEvent = basicEvent;
-            Data = data ?? new();
+            Data = data ?? new Dictionary<string, object>();
         }
     }
 }
