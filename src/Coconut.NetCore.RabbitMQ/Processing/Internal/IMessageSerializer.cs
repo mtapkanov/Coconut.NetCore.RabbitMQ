@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace Coconut.NetCore.RabbitMQ.Processing
+namespace Coconut.NetCore.RabbitMQ.Processing.Internal
 {
     /// <summary>
     ///     RabbitMQ message serializer.
     /// </summary>
-    public interface IMessageSerializer
+    internal interface IMessageSerializer
     {
         /// <summary>
         ///     Serialize RabbitMQ message.

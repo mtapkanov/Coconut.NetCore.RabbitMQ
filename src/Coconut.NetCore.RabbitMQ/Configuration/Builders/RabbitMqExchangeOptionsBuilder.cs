@@ -36,13 +36,13 @@ namespace Coconut.NetCore.RabbitMQ.Configuration.Builders
         /// <typeparam name="TMessage">The type of message that will be distributed through the exchange.</typeparam>
         /// <typeparam name="TMessageSerializer">Type of message serializer.</typeparam>
         public RabbitMqExchangeOptionsBuilder AcceptMessages<TMessage, TMessageSerializer>(Func<TMessage, string> routingKeyProvider = null)
-            where TMessageSerializer : IMessageSerializer
+            where TMessageSerializer : MessageSerializerBase<TMessage>
         {
             Func<object, string> getRoutingKey = routingKeyProvider is null
                 ? (object message) => string.Empty
                 : (object message) => routingKeyProvider((TMessage)message);
 
-            _acceptedPublishOptions.Add(new(typeof(TMessage), typeof(TMessageSerializer), getRoutingKey));
+            _acceptedPublishOptions.Add(new RabbitMqPublishOptions(typeof(TMessage), typeof(TMessageSerializer), getRoutingKey));
 
             _services.TryAddSingleton(typeof(TMessageSerializer));
 

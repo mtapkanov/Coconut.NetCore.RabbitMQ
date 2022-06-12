@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Coconut.NetCore.RabbitMQ.Configuration.Builders;
+using Coconut.NetCore.RabbitMQ.Configuration.Options;
 using Coconut.NetCore.RabbitMQ.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -26,14 +27,13 @@ namespace Coconut.NetCore.RabbitMQ.Extensions
             {
                 ServiceDescriptor.Singleton<IHostedService, RabbitMqStarterHostedService>(),
                 ServiceDescriptor.Singleton<RabbitMqEventBus, RabbitMqEventBus>(),
-                ServiceDescriptor.Singleton<RabbitMqFactory, RabbitMqFactory>(),
                 ServiceDescriptor.Transient<RabbitMqUnit, RabbitMqUnit>(),
                 ServiceDescriptor.Singleton<IRabbitMqBus, RabbitMqBus>(),
             });
 
             var options = new RabbitMqOptionsBuilder(services, uri);
             optionsAction(options);
-            services.AddTransient(provider => options.Build());
+            services.AddTransient(provider => ((IBuilder<RabbitMqOptions>)options).Build());
 
             return services;
         }

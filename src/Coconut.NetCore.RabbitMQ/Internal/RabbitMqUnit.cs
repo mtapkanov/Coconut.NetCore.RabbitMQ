@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
-using Coconut.NetCore.RabbitMQ.Configuration;
 using Coconut.NetCore.RabbitMQ.Configuration.Options;
 using Microsoft.Extensions.Logging;
 using Polly;
@@ -12,14 +11,14 @@ namespace Coconut.NetCore.RabbitMQ.Internal
 {
     internal class RabbitMqUnit
     {
-        private readonly RabbitMqFactory _factory;
+        private readonly IServiceProvider _provider;
         private readonly ILogger<RabbitMqUnit> _logger;
 
         public IConnection Connection { get; private set; }
 
-        public RabbitMqUnit(RabbitMqFactory factory, ILogger<RabbitMqUnit> logger)
+        public RabbitMqUnit(IServiceProvider provider, ILogger<RabbitMqUnit> logger)
         {
-            _factory = factory ?? throw new ArgumentNullException(nameof(factory));
+            _provider = provider ?? throw new ArgumentNullException(nameof(provider));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -31,10 +30,12 @@ namespace Coconut.NetCore.RabbitMQ.Internal
                 foreach (var exchangeOptions in options.RabbitMqExchangeOptions)
                     DeclareExchange(exchangeOptions);
 
-            if (options.RabbitMqQueueOptions.Any())
-                foreach (var queueOptions in options.RabbitMqQueueOptions)
-                    _factory.CreateQueueController(queueOptions, Connection)
-                        .Run(cancellationToken);
+            if (!options.RabbitMqQueueOptions.Any())
+                return;
+            
+            foreach (var queueOptions in options.RabbitMqQueueOptions)
+                new RabbitMqQueueController(_provider, Connection, queueOptions)
+                    .Run(cancellationToken);
         }
 
         public void Stop()
@@ -53,7 +54,8 @@ namespace Coconut.NetCore.RabbitMQ.Internal
             return Policy.Handle<BrokerUnreachableException>()
                 .WaitAndRetryForever(
                     sleepDurationProvider: WaitDurationProvider.WaitUpTo30Seconds,
-                    onRetry: (exception, timespan) => _logger.LogError(exception, $"RabbitMQ connecion failed. Retry in {timespan:c}. URI: {uri}"))
+                    onRetry: (exception, timespan) => 
+                        _logger.LogError(exception, $"RabbitMQ connecion failed. Retry in {timespan:c}. URI: {uri}"))
                 .Execute(token =>
                     {
                         token.ThrowIfCancellationRequested();

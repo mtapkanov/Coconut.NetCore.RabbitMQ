@@ -54,7 +54,7 @@ namespace Coconut.NetCore.RabbitMQ.Configuration.Builders
         }
 
         /// <inheritdoc />
-        public RabbitMqOptions Build()
+        RabbitMqOptions IBuilder<RabbitMqOptions>.Build()
         {
             var exchangeOptions = _exchangeBuilders.Select(x => x.Build()).ToArray();
             var queueOptions = _queueBuilders.Select(x => x.Build()).ToArray();

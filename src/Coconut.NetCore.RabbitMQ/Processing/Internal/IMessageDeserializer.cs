@@ -1,16 +1,16 @@
 ﻿using System;
 
-namespace Coconut.NetCore.RabbitMQ.Processing
+namespace Coconut.NetCore.RabbitMQ.Processing.Internal
 {
     /// <summary>
     ///     RabbitMQ message deserializer.
     /// </summary>
-    public interface IMessageDeserializer<out TMessage>
+    public interface IMessageDeserializer
     {
         /// <summary>
         ///     Deserialize RabbitMQ message.
         /// </summary>
         /// <param name="messageBytes">The message data to parse.</param>
-        TMessage Deserialize(ReadOnlySpan<byte> messageBytes);
+        object Deserialize(ReadOnlySpan<byte> messageBytes);
     }
 }

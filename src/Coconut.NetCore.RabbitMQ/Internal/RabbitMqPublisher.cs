@@ -1,6 +1,6 @@
 ﻿using System;
 using Coconut.NetCore.RabbitMQ.Configuration.Options;
-using Coconut.NetCore.RabbitMQ.Processing;
+using Coconut.NetCore.RabbitMQ.Processing.Internal;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 
@@ -25,12 +25,10 @@ namespace Coconut.NetCore.RabbitMQ.Internal
 
         public void Publish(object message)
         {
-            var routingKey = string.Empty;
+            var routingKey = _options.GetRoutingKey(message);
 
             try
             {
-                routingKey = _options.GetRoutingKey(message);
-
                 var messageBytes = _serializer.Serialize(message);
 
                 _channel.BasicPublish(
