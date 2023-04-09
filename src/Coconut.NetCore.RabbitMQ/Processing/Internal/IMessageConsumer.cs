@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace Coconut.NetCore.RabbitMQ.Processing
+namespace Coconut.NetCore.RabbitMQ.Processing.Internal
 {
     /// <summary>
     ///     Defines a class that is a consumer of a message. The message is wrapped in an IConsumeContext
@@ -9,14 +9,13 @@ namespace Coconut.NetCore.RabbitMQ.Processing
     ///     If consume context `Failed` set true or Consume method returns exception the message will be rejected.
     ///     Otherwise the message will be acknowledged.
     /// </summary>
-    /// <typeparam name="TMessage">The message type.</typeparam>
-    public interface IMessageConsumer<TMessage>
+    internal interface IMessageConsumer
     {
         /// <summary>
         ///     Consume RabbitMQ message.
         /// </summary>
         /// <param name="context">The message context.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        Task Consume(IConsumeContext<TMessage> context, CancellationToken cancellationToken);
+        Task Consume(IConsumeContext context, CancellationToken cancellationToken = default);
     }
 }

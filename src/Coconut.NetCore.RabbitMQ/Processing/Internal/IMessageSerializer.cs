@@ -1,16 +1,16 @@
 ﻿using System;
 
-namespace Coconut.NetCore.RabbitMQ.Processing
+namespace Coconut.NetCore.RabbitMQ.Processing.Internal
 {
     /// <summary>
     ///     RabbitMQ message serializer.
     /// </summary>
-    public interface IMessageSerializer<TMessage>
+    internal interface IMessageSerializer
     {
         /// <summary>
         ///     Serialize RabbitMQ message.
         /// </summary>
         /// <param name="message">The message to convert.</param>
-        ReadOnlyMemory<byte> Serialize(TMessage message);
+        ReadOnlyMemory<byte> Serialize(object message);
     }
 }

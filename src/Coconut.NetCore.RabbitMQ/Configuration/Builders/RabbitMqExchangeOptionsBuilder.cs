@@ -17,7 +17,7 @@ namespace Coconut.NetCore.RabbitMQ.Configuration.Builders
         private readonly IServiceCollection _services;
         private readonly RabbitMqExchangeSettings _exchangeSettings;
 
-        private readonly List<RabbitMqPublishOptions> _acceptedPublishOptions = new();
+        private readonly List<RabbitMqPublishOptions> _publishOptions = new();
 
         /// <summary>
         ///     Creates RabbitMQ exchange options builder.
@@ -36,13 +36,13 @@ namespace Coconut.NetCore.RabbitMQ.Configuration.Builders
         /// <typeparam name="TMessage">The type of message that will be distributed through the exchange.</typeparam>
         /// <typeparam name="TMessageSerializer">Type of message serializer.</typeparam>
         public RabbitMqExchangeOptionsBuilder AcceptMessages<TMessage, TMessageSerializer>(Func<TMessage, string> routingKeyProvider = null)
-            where TMessageSerializer : IMessageSerializer<TMessage>
+            where TMessageSerializer : MessageSerializerBase<TMessage>
         {
             Func<object, string> getRoutingKey = routingKeyProvider is null
                 ? (object message) => string.Empty
                 : (object message) => routingKeyProvider((TMessage)message);
 
-            _acceptedPublishOptions.Add(new(typeof(TMessage), typeof(TMessageSerializer), getRoutingKey));
+            _publishOptions.Add(new RabbitMqPublishOptions(typeof(TMessage), typeof(TMessageSerializer), getRoutingKey));
 
             _services.TryAddSingleton(typeof(TMessageSerializer));
 
@@ -52,9 +52,10 @@ namespace Coconut.NetCore.RabbitMQ.Configuration.Builders
         /// <inheritdoc />
         public RabbitMqExchangeOptions Build()
         {
-            if (!_acceptedPublishOptions.Any()) throw new NotSupportedException($"Message types must be defined in {nameof(RabbitMqExchangeOptionsBuilder)}");
+            if (!_publishOptions.Any()) 
+                throw new NotSupportedException($"Message types must be defined in {nameof(RabbitMqExchangeOptionsBuilder)}");
 
-            return new RabbitMqExchangeOptions(_exchangeSettings, _acceptedPublishOptions);
+            return new RabbitMqExchangeOptions(_exchangeSettings, _publishOptions);
         }
     }
 }

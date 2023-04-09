@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Coconut.NetCore.RabbitMQ.Configuration;
 using Coconut.NetCore.RabbitMQ.Configuration.Options;
 using Coconut.NetCore.RabbitMQ.Core.Handlers;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,20 +28,12 @@ namespace Coconut.NetCore.RabbitMQ.Internal
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             InitRabbitMqEventBus(_serviceProvider);
-
-            StartRabbitMqBus(_serviceProvider, stoppingToken);
-
-            return Task.CompletedTask;
+            return StartRabbitMqBus(_serviceProvider, stoppingToken);
         }
 
         /// <inheritdoc />
-        public override Task StopAsync(CancellationToken cancellationToken)
-        {
-            var rabbitMqBus = _serviceProvider.GetRequiredService<IRabbitMqBus>();
-            rabbitMqBus.Stop();
-
-            return base.StopAsync(cancellationToken);
-        }
+        public override Task StopAsync(CancellationToken cancellationToken) => 
+            _serviceProvider.GetRequiredService<IRabbitMqBusController>().Stop();
 
         private static void InitRabbitMqEventBus(IServiceProvider serviceProvider)
         {
@@ -52,12 +43,11 @@ namespace Coconut.NetCore.RabbitMQ.Internal
             rabbitMqEventBus.AddEventHandlers(eventHandlers);
         }
 
-        private static void StartRabbitMqBus(IServiceProvider serviceProvider, CancellationToken cancellationToken)
+        private static Task StartRabbitMqBus(IServiceProvider serviceProvider, CancellationToken cancellationToken)
         {
-            var rabbitMqUnitsOptions = serviceProvider.GetServices<RabbitMqOptions>().ToArray();
-            var rabbitMqBus = serviceProvider.GetRequiredService<IRabbitMqBus>();
-
-            rabbitMqBus.Start(rabbitMqUnitsOptions, cancellationToken);
+            var options = serviceProvider.GetServices<RabbitMqOptions>().ToArray();
+            return serviceProvider.GetRequiredService<IRabbitMqBusController>()
+                .Start(options, cancellationToken);
         }
     }
 }

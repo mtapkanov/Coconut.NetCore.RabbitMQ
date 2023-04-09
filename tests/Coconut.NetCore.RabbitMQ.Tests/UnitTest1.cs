@@ -1,4 +1,3 @@
-using System;
 using Xunit;
 
 namespace Coconut.NetCore.RabbitMQ.Tests

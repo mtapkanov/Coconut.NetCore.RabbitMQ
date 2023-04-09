@@ -2,6 +2,7 @@
 using Coconut.NetCore.RabbitMQ.Configuration.Options;
 using Coconut.NetCore.RabbitMQ.Configuration.Settings;
 using Coconut.NetCore.RabbitMQ.Processing;
+using Coconut.NetCore.RabbitMQ.Processing.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -48,7 +49,7 @@ namespace Coconut.NetCore.RabbitMQ.Configuration.Builders
         /// <typeparam name="TMessageConsumer">Type of message consumer.</typeparam>
         /// <param name="serviceLifetime">Specifies the lifetime of a consumer. Scoped by default.</param>
         public RabbitMqQueueOptionsBuilder<TMessage> UseConsumer<TMessageConsumer>(ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
-            where TMessageConsumer : IMessageConsumer<TMessage>
+            where TMessageConsumer : MessageConsumerBase<TMessage>
         {
             _consumerType = typeof(TMessageConsumer);
             _services.TryAdd(ServiceDescriptor.Describe(_consumerType, _consumerType, serviceLifetime));
@@ -59,8 +60,11 @@ namespace Coconut.NetCore.RabbitMQ.Configuration.Builders
         /// <inheritdoc />
         public RabbitMqQueueOptions Build()
         {
-            if (_deserializerType is null) throw new NotSupportedException($"Message deserializer must be defined in {nameof(RabbitMqQueueOptionsBuilder<TMessage>)}");
-            if (_consumerType is null) throw new NotSupportedException($"Message consumer must be defined in {nameof(RabbitMqQueueOptionsBuilder<TMessage>)}");
+            if (_deserializerType is null) 
+                throw new NotSupportedException($"Message deserializer must be defined in {nameof(RabbitMqQueueOptionsBuilder<TMessage>)}");
+            
+            if (_consumerType is null) 
+                throw new NotSupportedException($"Message consumer must be defined in {nameof(RabbitMqQueueOptionsBuilder<TMessage>)}");
 
             return new RabbitMqQueueOptions(_queueSettings, typeof(TMessage), _deserializerType, _consumerType);
         }

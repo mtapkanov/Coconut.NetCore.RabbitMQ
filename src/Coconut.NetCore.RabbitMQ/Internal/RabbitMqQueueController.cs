@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Coconut.NetCore.RabbitMQ.Configuration;
 using Coconut.NetCore.RabbitMQ.Configuration.Options;
 using Coconut.NetCore.RabbitMQ.Core.Events;
 using Coconut.NetCore.RabbitMQ.Processing;
@@ -16,32 +16,27 @@ using RabbitMQ.Client.Exceptions;
 
 namespace Coconut.NetCore.RabbitMQ.Internal
 {
-
-    internal class RabbitMqQueueController<TMessage> : IRabbitMqQueueController
+    internal class RabbitMqQueueController : IRabbitMqQueueController
     {
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IServiceProvider _provider;
         private readonly IConnection _connection;
         private readonly RabbitMqQueueOptions _queueOptions;
         private readonly RabbitMqEventBus _eventBus;
-        private readonly IMessageDeserializer<TMessage> _deserializer;
-        private readonly ILogger<RabbitMqQueueController<TMessage>> _logger;
+        private readonly IMessageDeserializer _deserializer;
+        private readonly ILogger _logger;
 
         public RabbitMqQueueController(
-            IServiceProvider serviceProvider,
+            IServiceProvider provider,
             IConnection connection,
-            RabbitMqQueueOptions queueOptions,
-            RabbitMqEventBus eventBus,
-            ILoggerFactory loggerFactory)
+            RabbitMqQueueOptions queueOptions)
         {
-            if (loggerFactory is null) throw new ArgumentNullException(nameof(loggerFactory));
-
-            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _provider = provider ?? throw new ArgumentNullException(nameof(provider));
             _connection = connection ?? throw new ArgumentNullException(nameof(connection));
             _queueOptions = queueOptions ?? throw new ArgumentNullException(nameof(queueOptions));
-            _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
-
-            _deserializer = (IMessageDeserializer<TMessage>)_serviceProvider.GetRequiredService(_queueOptions.DeserializerType);
-            _logger = loggerFactory.CreateLogger<RabbitMqQueueController<TMessage>>();
+            
+            _deserializer = (IMessageDeserializer)_provider.GetRequiredService(_queueOptions.DeserializerType);
+            _logger = _provider.GetRequiredService<ILoggerFactory>().CreateLogger($"{nameof(RabbitMqPublisher)}<{_queueOptions.MessageType.FullName}>");
+            _eventBus = _provider.GetRequiredService<RabbitMqEventBus>();
         }
 
         public void Run(CancellationToken cancellationToken)
@@ -58,7 +53,7 @@ namespace Coconut.NetCore.RabbitMQ.Internal
 
             if (declareSettings is null)
                 return;
-
+            
             channel.QueueDeclare(
                 _queueOptions.QueueSettings.Name,
                 declareSettings.Durable,
@@ -66,11 +61,17 @@ namespace Coconut.NetCore.RabbitMQ.Internal
                 declareSettings.AutoDelete,
                 declareSettings.Arguments);
 
+            if (declareSettings.Bindings is null)
+            {
+                _logger.LogWarning($"The Binding section is not specified in the configuration for queue {_queueOptions.QueueSettings.Name}. The message will not get into any queue.");
+                return;
+            }
+            
             foreach (var bindingSetting in declareSettings.Bindings)
                 channel.QueueBind(
                     _queueOptions.QueueSettings.Name,
                     bindingSetting.Exchange,
-                    bindingSetting.RoutingKey,
+                    bindingSetting.RoutingKey ?? string.Empty, 
                     bindingSetting.Arguments);
         }
 
@@ -78,24 +79,25 @@ namespace Coconut.NetCore.RabbitMQ.Internal
         {
             var basicConsumer = new AsyncEventingBasicConsumer(channel);
 
-            basicConsumer.Received += async (sender, basicEvent) =>
+            basicConsumer.Received += async (_, basicEvent) =>
             {
-                //using var correlationScope = _logger.BeginCorrelationScope();
-                using var scope = _serviceProvider.CreateScope();
-
                 bool failed;
                 Dictionary<string, object> data = null;
 
                 try
                 {
                     var message = _deserializer.Deserialize(basicEvent.Body.Span);
-                    var context = new ConsumeContext<TMessage>(basicEvent, message);
 
-                    var messageConsumer = GetConsumer(scope);
+                    var context = (IConsumeContext)Activator.CreateInstance(typeof(ConsumeContext<>)
+                        .MakeGenericType(_queueOptions.MessageType), basicEvent, message)!;
+
+                    var messageConsumer = GetConsumer();
+
                     await messageConsumer.Consume(context, cancellationToken);
 
                     if (context.Failed)
                         _logger.LogError($"Message consumption failed. Sending back to queue. Delivery tag: {basicEvent.DeliveryTag}; Exchange: {basicEvent.Exchange}; Routing key:{basicEvent.RoutingKey}");
+                    
                     else if (_logger.IsEnabled(LogLevel.Trace))
                         _logger.LogTrace($"Message consumption success. Removing from queue. Delivery tag: {basicEvent.DeliveryTag}; Exchange: {basicEvent.Exchange}; Routing key:{basicEvent.RoutingKey}");
 
@@ -148,8 +150,11 @@ namespace Coconut.NetCore.RabbitMQ.Internal
                     },
                     cancellationToken);
 
-        private IMessageConsumer<TMessage> GetConsumer(IServiceScope scope) =>
-            (IMessageConsumer<TMessage>)scope.ServiceProvider.GetRequiredService(_queueOptions.ConsumerType);
+        private IMessageConsumer GetConsumer()
+        {
+            using var serviceScope = _provider.CreateScope();
+            return (IMessageConsumer)serviceScope.ServiceProvider.GetRequiredService(_queueOptions.ConsumerType);
+        }
 
         private static IModel CreateChannel(IConnection connection, ushort prefetchCount)
         {

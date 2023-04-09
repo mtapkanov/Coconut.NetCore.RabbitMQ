@@ -54,11 +54,12 @@ namespace Coconut.NetCore.RabbitMQ.Configuration.Builders
         }
 
         /// <inheritdoc />
-        public RabbitMqOptions Build() =>
-            new(
-                _uri,
-                _exchangeBuilders.Select(x => x.Build()).ToArray(),
-                _queueBuilders.Select(x => x.Build()).ToArray()
-            );
+        RabbitMqOptions IBuilder<RabbitMqOptions>.Build()
+        {
+            var exchangeOptions = _exchangeBuilders.Select(x => x.Build()).ToArray();
+            var queueOptions = _queueBuilders.Select(x => x.Build()).ToArray();
+
+            return new RabbitMqOptions(_uri, exchangeOptions, queueOptions);
+        }
     }
 }

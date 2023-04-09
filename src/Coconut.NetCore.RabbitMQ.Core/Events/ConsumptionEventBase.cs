@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Coconut.NetCore.RabbitMQ.Core.Events;
 using RabbitMQ.Client.Events;
 
-namespace Coconut.NetCore.RabbitMQ.Events
+namespace Coconut.NetCore.RabbitMQ.Core.Events
 {
     /// <summary>
     ///     RabbitMQ message consumption event.
@@ -30,7 +28,7 @@ namespace Coconut.NetCore.RabbitMQ.Events
         protected ConsumptionEventBase(BasicDeliverEventArgs basicEvent, Dictionary<string, object> data)
         {
             BasicEvent = basicEvent;
-            Data = data ?? new();
+            Data = data ?? new Dictionary<string, object>();
         }
     }
 }

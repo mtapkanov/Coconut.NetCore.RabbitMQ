@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using Coconut.NetCore.RabbitMQ.Configuration.Builders;
+using Coconut.NetCore.RabbitMQ.Configuration.Options;
 using Coconut.NetCore.RabbitMQ.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
-namespace Coconut.NetCore.RabbitMQ
+namespace Coconut.NetCore.RabbitMQ.Extensions
 {
     /// <summary>
     ///     RabbitMQ service collection extension methods.
@@ -24,16 +25,17 @@ namespace Coconut.NetCore.RabbitMQ
         {
             services.TryAdd(new List<ServiceDescriptor>
             {
+                ServiceDescriptor.Singleton<IRabbitMqBusController, RabbitMqBusController>(),
                 ServiceDescriptor.Singleton<IHostedService, RabbitMqStarterHostedService>(),
                 ServiceDescriptor.Singleton<RabbitMqEventBus, RabbitMqEventBus>(),
-                ServiceDescriptor.Singleton<RabbitMqFactory, RabbitMqFactory>(),
-                ServiceDescriptor.Transient<RabbitMqUnit, RabbitMqUnit>(),
+                ServiceDescriptor.Singleton<PublisherCache, PublisherCache>(),
                 ServiceDescriptor.Singleton<IRabbitMqBus, RabbitMqBus>(),
+                ServiceDescriptor.Transient<RabbitMqUnit, RabbitMqUnit>(),
             });
 
             var options = new RabbitMqOptionsBuilder(services, uri);
             optionsAction(options);
-            services.AddTransient(provider => options.Build());
+            services.AddTransient(_ => ((IBuilder<RabbitMqOptions>)options).Build());
 
             return services;
         }
