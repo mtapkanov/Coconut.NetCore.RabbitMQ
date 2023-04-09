@@ -24,7 +24,7 @@ namespace Coconut.NetCore.RabbitMQ.Internal
             if (!_cache.TryGetValue(type, out var publishers))
                 throw new NotSupportedException($"Message type {type.FullName} not configured to publishing in RabbitMQ bus.");
 
-            return (List<IRabbitMqPublisher>) publishers;
+            return publishers as List<IRabbitMqPublisher>;
         }
     }
 }

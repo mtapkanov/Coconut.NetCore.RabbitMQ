@@ -55,7 +55,7 @@ namespace Coconut.NetCore.RabbitMQ.Internal
                 .WaitAndRetryForever(
                     sleepDurationProvider: WaitDurationProvider.WaitUpTo30Seconds,
                     onRetry: (exception, timespan) => 
-                        _logger.LogError(exception, $"RabbitMQ connection failed. Retry in {timespan:c}. URI: {uri}"))
+                        _logger.LogError(exception, "RabbitMQ connection failed. Retry in {Timespan}. URI: {Uri}", timespan, uri))
                 .Execute(token =>
                     {
                         token.ThrowIfCancellationRequested();

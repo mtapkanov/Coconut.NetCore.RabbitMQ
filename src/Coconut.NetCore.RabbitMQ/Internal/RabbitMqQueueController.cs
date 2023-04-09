@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Coconut.NetCore.RabbitMQ.Configuration.Options;
@@ -60,6 +61,12 @@ namespace Coconut.NetCore.RabbitMQ.Internal
                 declareSettings.AutoDelete,
                 declareSettings.Arguments);
 
+            if (declareSettings.Bindings is null)
+            {
+                _logger.LogWarning($"The Binding section is not specified in the configuration for queue {_queueOptions.QueueSettings.Name}. The message will not get into any queue.");
+                return;
+            }
+            
             foreach (var bindingSetting in declareSettings.Bindings)
                 channel.QueueBind(
                     _queueOptions.QueueSettings.Name,

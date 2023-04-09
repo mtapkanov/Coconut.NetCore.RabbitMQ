@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <PackageVersion>0.0.0.0</PackageVersion>
         <Title>Coconut.NetCore.RabbitMQ.Core</Title>
         <PackageLicenseUrl>MIT</PackageLicenseUrl>

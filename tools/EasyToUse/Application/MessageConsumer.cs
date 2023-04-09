@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Coconut.NetCore.RabbitMQ.Processing;
 
-namespace Coconut.NetCore.RabbitMQ.Tools
+namespace EasyToUse.Application
 {
     public class MessageConsumer : MessageConsumerBase<Message>
     {

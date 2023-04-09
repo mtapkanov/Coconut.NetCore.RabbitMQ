@@ -1,7 +1,7 @@
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace Coconut.NetCore.RabbitMQ.Tools
+namespace EasyToUse.Infrastructure.Serialization
 {
     public static class ByteConverterHelper
     {
