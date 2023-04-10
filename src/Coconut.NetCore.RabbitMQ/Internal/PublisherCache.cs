@@ -11,7 +11,7 @@ namespace Coconut.NetCore.RabbitMQ.Internal
         public void AddPublisher(Type type, IRabbitMqPublisher publisher)
         {
             _cache.AddOrUpdate(type,
-                addValueFactory: _ => new List<IRabbitMqPublisher> {publisher},
+                addValueFactory: _ => new List<IRabbitMqPublisher> { publisher },
                 updateValueFactory: (_, list) =>
                 {
                     list.Add(publisher);

@@ -33,7 +33,7 @@ namespace Coconut.NetCore.RabbitMQ.Internal
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
             _connection = connection ?? throw new ArgumentNullException(nameof(connection));
             _queueOptions = queueOptions ?? throw new ArgumentNullException(nameof(queueOptions));
-            
+
             _deserializer = (IMessageDeserializer)_provider.GetRequiredService(_queueOptions.DeserializerType);
             _logger = _provider.GetRequiredService<ILoggerFactory>().CreateLogger($"{nameof(RabbitMqPublisher)}<{_queueOptions.MessageType.FullName}>");
             _eventBus = _provider.GetRequiredService<RabbitMqEventBus>();
@@ -53,7 +53,7 @@ namespace Coconut.NetCore.RabbitMQ.Internal
 
             if (declareSettings is null)
                 return;
-            
+
             channel.QueueDeclare(
                 _queueOptions.QueueSettings.Name,
                 declareSettings.Durable,
@@ -66,12 +66,12 @@ namespace Coconut.NetCore.RabbitMQ.Internal
                 _logger.LogWarning($"The Binding section is not specified in the configuration for queue {_queueOptions.QueueSettings.Name}. The message will not get into any queue.");
                 return;
             }
-            
+
             foreach (var bindingSetting in declareSettings.Bindings)
                 channel.QueueBind(
                     _queueOptions.QueueSettings.Name,
                     bindingSetting.Exchange,
-                    bindingSetting.RoutingKey ?? string.Empty, 
+                    bindingSetting.RoutingKey ?? string.Empty,
                     bindingSetting.Arguments);
         }
 
@@ -97,7 +97,7 @@ namespace Coconut.NetCore.RabbitMQ.Internal
 
                     if (context.Failed)
                         _logger.LogError($"Message consumption failed. Sending back to queue. Delivery tag: {basicEvent.DeliveryTag}; Exchange: {basicEvent.Exchange}; Routing key:{basicEvent.RoutingKey}");
-                    
+
                     else if (_logger.IsEnabled(LogLevel.Trace))
                         _logger.LogTrace($"Message consumption success. Removing from queue. Delivery tag: {basicEvent.DeliveryTag}; Exchange: {basicEvent.Exchange}; Routing key:{basicEvent.RoutingKey}");
 

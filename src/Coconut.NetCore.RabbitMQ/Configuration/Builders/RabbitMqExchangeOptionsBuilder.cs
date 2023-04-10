@@ -50,9 +50,9 @@ namespace Coconut.NetCore.RabbitMQ.Configuration.Builders
         }
 
         /// <inheritdoc />
-        public RabbitMqExchangeOptions Build()
+        RabbitMqExchangeOptions IBuilder<RabbitMqExchangeOptions>.Build()
         {
-            if (!_publishOptions.Any()) 
+            if (!_publishOptions.Any())
                 throw new NotSupportedException($"Message types must be defined in {nameof(RabbitMqExchangeOptionsBuilder)}");
 
             return new RabbitMqExchangeOptions(_exchangeSettings, _publishOptions);

@@ -11,7 +11,7 @@ namespace Coconut.NetCore.RabbitMQ.Processing
         public abstract Task Consume(ConsumeContext<TMessage> context, CancellationToken cancellationToken);
 
         /// <inheritdoc />
-        public Task Consume(IConsumeContext context, CancellationToken cancellationToken = default) => 
-            Consume((ConsumeContext<TMessage>) context, cancellationToken);
+        public Task Consume(IConsumeContext context, CancellationToken cancellationToken = default) =>
+            Consume((ConsumeContext<TMessage>)context, cancellationToken);
     }
 }

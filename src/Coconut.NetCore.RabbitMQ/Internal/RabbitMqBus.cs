@@ -5,7 +5,7 @@ namespace Coconut.NetCore.RabbitMQ.Internal
     internal class RabbitMqBus : IRabbitMqBus
     {
         private readonly PublisherCache _publisherCache;
-        
+
         public RabbitMqBus(PublisherCache publisherCache)
         {
             _publisherCache = publisherCache ?? throw new ArgumentNullException(nameof(publisherCache));

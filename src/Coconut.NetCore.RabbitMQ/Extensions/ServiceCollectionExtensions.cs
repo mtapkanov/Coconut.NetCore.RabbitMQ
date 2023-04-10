@@ -23,15 +23,12 @@ namespace Coconut.NetCore.RabbitMQ.Extensions
         /// <returns>Contract for a collection of service descriptors where the RabbitMqBus registered.</returns>
         public static IServiceCollection AddRabbitMq(this IServiceCollection services, Uri uri, Action<RabbitMqOptionsBuilder> optionsAction)
         {
-            services.TryAdd(new List<ServiceDescriptor>
-            {
-                ServiceDescriptor.Singleton<IRabbitMqBusController, RabbitMqBusController>(),
-                ServiceDescriptor.Singleton<IHostedService, RabbitMqStarterHostedService>(),
-                ServiceDescriptor.Singleton<RabbitMqEventBus, RabbitMqEventBus>(),
-                ServiceDescriptor.Singleton<PublisherCache, PublisherCache>(),
-                ServiceDescriptor.Singleton<IRabbitMqBus, RabbitMqBus>(),
-                ServiceDescriptor.Transient<RabbitMqUnit, RabbitMqUnit>(),
-            });
+            services.AddHostedService<RabbitMqStarterHostedService>();
+            services.AddSingleton<IRabbitMqStarter, RabbitMqStarter>();
+            services.TryAddSingleton<RabbitMqEventBus>();
+            services.TryAddSingleton<PublisherCache>();
+            services.TryAddSingleton<IRabbitMqBus, RabbitMqBus>();
+            services.AddTransient<RabbitMqUnit>();
 
             var options = new RabbitMqOptionsBuilder(services, uri);
             optionsAction(options);
