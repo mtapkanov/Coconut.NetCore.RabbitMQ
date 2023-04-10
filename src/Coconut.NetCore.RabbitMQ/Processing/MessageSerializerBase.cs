@@ -10,7 +10,7 @@ namespace Coconut.NetCore.RabbitMQ.Processing
         public abstract ReadOnlyMemory<byte> Serialize(TMessage message);
 
         /// <inheritdoc />
-        public ReadOnlyMemory<byte> Serialize(object message) => 
+        public ReadOnlyMemory<byte> Serialize(object message) =>
             Serialize((TMessage)message);
     }
 }

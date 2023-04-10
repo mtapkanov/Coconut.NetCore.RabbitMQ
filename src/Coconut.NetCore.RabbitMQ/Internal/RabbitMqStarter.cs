@@ -11,13 +11,13 @@ using RabbitMQ.Client;
 
 namespace Coconut.NetCore.RabbitMQ.Internal
 {
-    internal class RabbitMqBusController : IRabbitMqBusController
+    internal class RabbitMqStarter : IRabbitMqStarter
     {
         private readonly IServiceProvider _provider;
         private readonly List<RabbitMqUnit> _rabbitMqUnits = new();
         private readonly PublisherCache _publisherCache;
 
-        public RabbitMqBusController(IServiceProvider provider)
+        public RabbitMqStarter(IServiceProvider provider)
         {
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
             _publisherCache = _provider.GetRequiredService<PublisherCache>();
@@ -35,7 +35,7 @@ namespace Coconut.NetCore.RabbitMQ.Internal
 
                 StartPublishers(rabbitMqOptions, rabbitMqUnit.Connection);
             }
-            
+
             return Task.CompletedTask;
         }
 
@@ -44,7 +44,7 @@ namespace Coconut.NetCore.RabbitMQ.Internal
             _rabbitMqUnits.ForEach(rabbitMqUnit => rabbitMqUnit.Stop());
             return Task.CompletedTask;
         }
-        
+
         private void StartPublishers(RabbitMqOptions rabbitMqOptions, IConnection connection)
         {
             foreach (var (exchangeName, publishOptions) in GetPublishOptions(rabbitMqOptions))
@@ -57,7 +57,7 @@ namespace Coconut.NetCore.RabbitMQ.Internal
                 _publisherCache.AddPublisher(publishOptions.MessageType, publisher);
             }
         }
-        
+
         private static IEnumerable<(string exchangeName, RabbitMqPublishOptions publishOptions)> GetPublishOptions(RabbitMqOptions rabbitMqOptions) =>
             rabbitMqOptions.RabbitMqExchangeOptions
                 .SelectMany(exchangeOptions => exchangeOptions.AcceptedPublishOptions

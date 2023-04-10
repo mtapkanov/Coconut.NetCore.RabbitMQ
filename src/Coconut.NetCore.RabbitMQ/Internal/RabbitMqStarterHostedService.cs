@@ -28,12 +28,19 @@ namespace Coconut.NetCore.RabbitMQ.Internal
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             InitRabbitMqEventBus(_serviceProvider);
-            return StartRabbitMqBus(_serviceProvider, stoppingToken);
+
+            StartRabbitMqBus(_serviceProvider, stoppingToken);
+
+            return Task.CompletedTask;
         }
 
         /// <inheritdoc />
-        public override Task StopAsync(CancellationToken cancellationToken) => 
-            _serviceProvider.GetRequiredService<IRabbitMqBusController>().Stop();
+        public override Task StopAsync(CancellationToken cancellationToken)
+        {
+            _serviceProvider.GetRequiredService<IRabbitMqStarter>().Stop();
+
+            return base.StopAsync(cancellationToken);
+        }
 
         private static void InitRabbitMqEventBus(IServiceProvider serviceProvider)
         {
@@ -46,7 +53,7 @@ namespace Coconut.NetCore.RabbitMQ.Internal
         private static Task StartRabbitMqBus(IServiceProvider serviceProvider, CancellationToken cancellationToken)
         {
             var options = serviceProvider.GetServices<RabbitMqOptions>().ToArray();
-            return serviceProvider.GetRequiredService<IRabbitMqBusController>()
+            return serviceProvider.GetRequiredService<IRabbitMqStarter>()
                 .Start(options, cancellationToken);
         }
     }

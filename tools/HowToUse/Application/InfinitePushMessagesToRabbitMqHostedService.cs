@@ -3,10 +3,10 @@ using Coconut.NetCore.RabbitMQ;
 
 namespace HowToUse.Application
 {
-    public class InfinitePushMessagesToRabbitMqHostedService:BackgroundService
+    public class InfinitePushMessagesToRabbitMqHostedService : BackgroundService
     {
         private readonly Fixture _fixture = new();
-        
+
         private readonly IRabbitMqBus _bus;
 
         public InfinitePushMessagesToRabbitMqHostedService(IRabbitMqBus bus)
@@ -21,7 +21,7 @@ namespace HowToUse.Application
                 var message = _fixture.Create<Message>();
                 _bus.Publish(message);
             }
-            
+
             return Task.CompletedTask;
         }
     }

@@ -32,7 +32,7 @@ namespace Coconut.NetCore.RabbitMQ.Internal
 
             if (!options.RabbitMqQueueOptions.Any())
                 return;
-            
+
             foreach (var queueOptions in options.RabbitMqQueueOptions)
                 new RabbitMqQueueController(_provider, Connection, queueOptions)
                     .Run(cancellationToken);
@@ -54,7 +54,7 @@ namespace Coconut.NetCore.RabbitMQ.Internal
             return Policy.Handle<BrokerUnreachableException>()
                 .WaitAndRetryForever(
                     sleepDurationProvider: WaitDurationProvider.WaitUpTo30Seconds,
-                    onRetry: (exception, timespan) => 
+                    onRetry: (exception, timespan) =>
                         _logger.LogError(exception, "RabbitMQ connection failed. Retry in {Timespan}. URI: {Uri}", timespan, uri))
                 .Execute(token =>
                     {

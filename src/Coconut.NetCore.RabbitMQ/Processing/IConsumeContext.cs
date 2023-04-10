@@ -13,12 +13,12 @@ namespace Coconut.NetCore.RabbitMQ.Processing
         ///     the Basic content-class.
         /// </summary>
         BasicDeliverEventArgs BasicEvent { get; }
-        
+
         /// <summary>
         ///     If set true, consumption marked failed and message must be returned to queue.
         /// </summary>
         bool Failed { get; set; }
-        
+
         /// <summary>
         ///     Stores user data that will be passed to events.
         /// </summary>
