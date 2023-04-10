@@ -2,6 +2,6 @@
 {
     internal interface IRabbitMqPublisher
     {
-        void Publish(object messsage);
+        void Publish(object message);
     }
 }

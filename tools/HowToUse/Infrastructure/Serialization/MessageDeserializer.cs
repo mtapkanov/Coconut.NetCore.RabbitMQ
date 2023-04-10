@@ -1,7 +1,6 @@
-using System;
 using Coconut.NetCore.RabbitMQ.Processing;
 
-namespace EasyToUse.Infrastructure.Serialization
+namespace HowToUse.Infrastructure.Serialization
 {
     public class MessageDeserializer : MessageDeserializerBase<Message>
     {

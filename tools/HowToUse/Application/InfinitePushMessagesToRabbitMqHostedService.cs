@@ -1,11 +1,7 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using AutoFixture;
 using Coconut.NetCore.RabbitMQ;
-using Microsoft.Extensions.Hosting;
 
-namespace EasyToUse.Application
+namespace HowToUse.Application
 {
     public class InfinitePushMessagesToRabbitMqHostedService:BackgroundService
     {
