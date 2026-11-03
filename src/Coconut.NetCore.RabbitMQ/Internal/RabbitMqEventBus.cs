@@ -1,42 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Coconut.NetCore.RabbitMQ.Core.Events;
 using Coconut.NetCore.RabbitMQ.Core.Handlers;
 using Microsoft.Extensions.Logging;
 
-namespace Coconut.NetCore.RabbitMQ.Internal
+namespace Coconut.NetCore.RabbitMQ.Internal;
+
+internal sealed class RabbitMqEventBus(IEnumerable<IRabbitMqEventHandler> handlers, ILogger<RabbitMqEventBus> logger)
 {
-    internal class RabbitMqEventBus
+    private readonly IRabbitMqEventHandler[] _handlers = [.. handlers];
+
+    public ValueTask PublishAsync(IRabbitMqEvent @event, CancellationToken cancellationToken) =>
+        _handlers.Length == 0 ? ValueTask.CompletedTask : PublishCoreAsync(@event, cancellationToken);
+
+    private async ValueTask PublishCoreAsync(IRabbitMqEvent @event, CancellationToken cancellationToken)
     {
-        private readonly ILogger<RabbitMqEventBus> _logger;
-
-        private List<IRabbitMqEventHandler> _eventHandlers;
-
-        public RabbitMqEventBus(ILogger<RabbitMqEventBus> logger)
+        foreach (var handler in _handlers)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        public void AddEventHandlers(params IRabbitMqEventHandler[] eventHandlers)
-        {
-            _eventHandlers ??= new List<IRabbitMqEventHandler>();
-            _eventHandlers.AddRange(eventHandlers);
-        }
-
-        public async Task Publish(IRabbitMqEvent @event, CancellationToken cancellationToken)
-        {
-            foreach (var eventHandler in _eventHandlers)
+            try
             {
-                try
-                {
-                    await eventHandler.Handle(@event, cancellationToken);
-                }
-                catch (Exception exception)
-                {
-                    _logger.LogError(exception, $"RabbitMQ event handing error. Event info: {@event.ToString()}");
-                }
+                await handler.HandleAsync(@event, cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception exception)
+            {
+                Log.EventHandlerFailed(logger, exception, handler.GetType().Name, @event);
             }
         }
     }

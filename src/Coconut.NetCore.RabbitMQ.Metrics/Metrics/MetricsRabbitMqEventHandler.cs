@@ -1,33 +1,22 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Coconut.NetCore.RabbitMQ.Core.Events;
 using Coconut.NetCore.RabbitMQ.Core.Handlers;
 
-namespace Coconut.NetCore.RabbitMQ.Metrics.Metrics
+namespace Coconut.NetCore.RabbitMQ.Metrics.Metrics;
+
+internal sealed class MetricsRabbitMqEventHandler(NumberOfProcessedRabbitMqMetrics metrics) : IRabbitMqEventHandler
 {
-    internal class MetricsRabbitMqEventHandler : IRabbitMqEventHandler
+    public ValueTask HandleAsync(IRabbitMqEvent @event, CancellationToken cancellationToken)
     {
-        private readonly NumberOfProcessedRabbitMqMetrics _metrics;
-
-        public MetricsRabbitMqEventHandler(NumberOfProcessedRabbitMqMetrics numberOfProcessedRabbitMqMetrics)
+        switch (@event)
         {
-            _metrics = numberOfProcessedRabbitMqMetrics ?? throw new ArgumentNullException(nameof(numberOfProcessedRabbitMqMetrics));
+            case MessageAcknowledgedEvent { Exchange: var exchange, RoutingKey: var routingKey }:
+                metrics.IncrementAcknowledged(exchange, routingKey);
+                break;
+            case MessageRejectedEvent { Exchange: var exchange, RoutingKey: var routingKey }:
+                metrics.IncrementRejected(exchange, routingKey);
+                break;
         }
 
-        public Task Handle(IRabbitMqEvent @event, CancellationToken cancellationToken)
-        {
-            switch (@event)
-            {
-                case MessageAcknowledgedEvent messageAcknowledged:
-                    _metrics.IncrementAcknowledgedMessagesCount(messageAcknowledged.BasicEvent.Exchange, messageAcknowledged.BasicEvent.RoutingKey);
-                    break;
-                case MessageRejectedEvent messageRejected:
-                    _metrics.IncrementRejectedMessagesCount(messageRejected.BasicEvent.Exchange, messageRejected.BasicEvent.RoutingKey);
-                    break;
-            }
-
-            return Task.CompletedTask;
-        }
+        return ValueTask.CompletedTask;
     }
 }

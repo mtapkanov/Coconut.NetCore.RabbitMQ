@@ -1,33 +1,42 @@
-﻿namespace Coconut.NetCore.RabbitMQ.Metrics
+namespace Coconut.NetCore.RabbitMQ.Metrics;
+
+/// <summary>
+///     Value type exported as the <c>value_type</c> static label.
+/// </summary>
+public sealed class MetricValueType
 {
-    /// <summary>
-    ///     Type of metric value
-    /// </summary>
-    public class MetricValueType
-    {
-        /// <summary>
-        ///     Integer number
-        /// </summary>
-        public static MetricValueType Integer { get; } = new MetricValueType("integer");
+    private readonly string _value;
 
-        /// <summary>
-        ///     Floating point number
-        /// </summary>
-        public static MetricValueType Float { get; } = new MetricValueType("float");
+    private MetricValueType(string value) => _value = value;
 
-        /// <summary>
-        ///     Text
-        /// </summary>
-        public static MetricValueType Text { get; } = new MetricValueType("text");
+    /// <summary>Integer value.</summary>
+    public static MetricValueType Integer { get; } = new("integer");
 
-        private readonly string _value;
+    /// <summary>Floating point value.</summary>
+    public static MetricValueType Float { get; } = new("float");
 
-        private MetricValueType(string value)
-        {
-            _value = value;
-        }
+    /// <summary>Text value.</summary>
+    public static MetricValueType Text { get; } = new("text");
 
-        /// <inheritdoc/>
-        public override string ToString() => _value;
-    }
+    /// <inheritdoc />
+    public override string ToString() => _value;
+}
+
+/// <summary>
+///     Rate period exported as the <c>change_tracking_period</c> static label.
+/// </summary>
+public sealed class MetricChangeTrackingPeriod
+{
+    private readonly string _value;
+
+    private MetricChangeTrackingPeriod(string value) => _value = value;
+
+    /// <summary>Per second.</summary>
+    public static MetricChangeTrackingPeriod PerSecond { get; } = new("ps");
+
+    /// <summary>Per minute.</summary>
+    public static MetricChangeTrackingPeriod PerMinute { get; } = new("pm");
+
+    /// <inheritdoc />
+    public override string ToString() => _value;
 }

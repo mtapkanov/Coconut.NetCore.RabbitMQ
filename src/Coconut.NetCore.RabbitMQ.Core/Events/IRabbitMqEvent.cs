@@ -1,20 +1,6 @@
-using System.Collections.Generic;
+namespace Coconut.NetCore.RabbitMQ.Core.Events;
 
-namespace Coconut.NetCore.RabbitMQ.Core.Events
-{
-    /// <summary>
-    ///     Common interface for RabbitMQ bus events.
-    /// </summary>
-    public interface IRabbitMqEvent
-    {
-        /// <summary>
-        ///     Provides store for custom event data.
-        /// </summary>
-        Dictionary<string, object> Data { get; }
-
-        /// <summary>
-        ///     Representation of event properties as a logging string.
-        /// </summary>
-        string ToString();
-    }
-}
+/// <summary>
+///     Marker for events raised by the RabbitMQ bus and delivered to <see cref="Handlers.IRabbitMqEventHandler" />.
+/// </summary>
+public interface IRabbitMqEvent;

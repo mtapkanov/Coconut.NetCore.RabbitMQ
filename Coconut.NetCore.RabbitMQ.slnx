@@ -1,0 +1,22 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="CLAUDE.md" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Coconut.NetCore.RabbitMQ.Core/Coconut.NetCore.RabbitMQ.Core.csproj" />
+    <Project Path="src/Coconut.NetCore.RabbitMQ.Metrics/Coconut.NetCore.RabbitMQ.Metrics.csproj" />
+    <Project Path="src/Coconut.NetCore.RabbitMQ/Coconut.NetCore.RabbitMQ.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Coconut.NetCore.RabbitMQ.Core.Tests/Coconut.NetCore.RabbitMQ.Core.Tests.csproj" />
+    <Project Path="tests/Coconut.NetCore.RabbitMQ.Metrics.Tests/Coconut.NetCore.RabbitMQ.Metrics.Tests.csproj" />
+    <Project Path="tests/Coconut.NetCore.RabbitMQ.Tests/Coconut.NetCore.RabbitMQ.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/HowToUse/HowToUse.csproj" />
+  </Folder>
+</Solution>

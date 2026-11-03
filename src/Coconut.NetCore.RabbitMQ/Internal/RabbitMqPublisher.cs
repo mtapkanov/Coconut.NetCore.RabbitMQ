@@ -1,51 +1,48 @@
-﻿using System;
-using Coconut.NetCore.RabbitMQ.Configuration.Options;
-using Coconut.NetCore.RabbitMQ.Processing.Internal;
+using Coconut.NetCore.RabbitMQ.Processing;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Exceptions;
 
-namespace Coconut.NetCore.RabbitMQ.Internal
+namespace Coconut.NetCore.RabbitMQ.Internal;
+
+internal interface IRabbitMqPublisher<in TMessage>
 {
-    internal class RabbitMqPublisher : IRabbitMqPublisher
+    ValueTask PublishAsync(TMessage message, CancellationToken cancellationToken);
+}
+
+/// <remarks>
+///     <see cref="IChannel.BasicPublishAsync{TProperties}(string, string, bool, TProperties, ReadOnlyMemory{byte}, CancellationToken)" />
+///     is safe for concurrent use in RabbitMQ.Client 7: each command is serialized into a single buffer before it is written,
+///     and with confirm tracking the channel semaphore covers only sequence number assignment and the write, not the wait for the confirm.
+///     So no extra locking here, and concurrent publishes are pipelined.
+/// </remarks>
+internal sealed class RabbitMqPublisher<TMessage>(
+    IChannel channel,
+    string exchange,
+    IMessageSerializer<TMessage> serializer,
+    Func<TMessage, string> routingKey,
+    PublishPropertiesFactory<TMessage> properties,
+    ILogger logger) : IRabbitMqPublisher<TMessage>
+{
+    public async ValueTask PublishAsync(TMessage message, CancellationToken cancellationToken)
     {
-        private readonly IModel _channel;
-        private readonly RabbitMqPublishOptions _options;
-        private readonly IMessageSerializer _serializer;
-        private readonly string _exchangeName;
-        private readonly ILogger _logger;
+        var key = routingKey(message);
+        var body = serializer.Serialize(message);
 
-        public RabbitMqPublisher(IModel channel, RabbitMqPublishOptions options, IMessageSerializer serializer, string exchangeName, ILogger logger)
+        try
         {
-            _channel = channel ?? throw new ArgumentNullException(nameof(channel));
-            _options = options ?? throw new ArgumentNullException(nameof(options));
-            _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-            _exchangeName = exchangeName ?? throw new ArgumentNullException(nameof(exchangeName));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            await channel.BasicPublishAsync(exchange, key, mandatory: true, properties.Create(message), body, cancellationToken).ConfigureAwait(false);
+            Log.MessagePublished(logger, exchange, key);
         }
-
-        public void Publish(object message)
+        catch (PublishException exception)
         {
-            var routingKey = _options.GetRoutingKey(message);
-
-            try
-            {
-                var messageBytes = _serializer.Serialize(message);
-
-                _channel.BasicPublish(
-                    exchange: _exchangeName,
-                    routingKey: routingKey,
-                    mandatory: true,
-                    body: messageBytes);
-
-                if (_logger.IsEnabled(LogLevel.Trace))
-                    _logger.LogTrace($"Message published. Exchange: {_exchangeName}; Routing key:{routingKey}");
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError(exception, $"Message publish failed. Exchange: {_exchangeName}; Routing key:{routingKey}");
-
-                throw;
-            }
+            Log.MessageNotConfirmed(logger, exception, exchange, key, exception.IsReturn);
+            throw;
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            Log.PublishFailed(logger, exception, exchange, key);
+            throw;
         }
     }
 }

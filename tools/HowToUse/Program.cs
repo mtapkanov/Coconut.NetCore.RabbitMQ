@@ -4,27 +4,32 @@ using HowToUse;
 using HowToUse.Application;
 using HowToUse.Infrastructure.Configuration;
 using HowToUse.Infrastructure.Serialization;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddLogging();
-builder.Services.UseConfiguration(builder.Configuration);
 
-var rabbitMqSettings = AppConfiguration.RabbitMqSettings;
+var rabbitMq = builder.Configuration.GetRequiredSection(RabbitMqSettings.SectionName).Get<RabbitMqSettings>()
+    ?? throw new InvalidOperationException($"Section '{RabbitMqSettings.SectionName}' is empty.");
 
-builder.Services.AddRabbitMq(rabbitMqSettings!.BaseUri, options =>
-{
-    options.AddExchange(rabbitMqSettings.Exchange)
-        .AcceptMessages<Message, MessageSerializer>(_ => "*");
+builder.Services
+    .AddMetricsAppName("HowToUse")
+    .AddRabbitMqMetrics()
+    .AddRabbitMq(rabbitMq.BaseUri, options =>
+    {
+        options.AddExchange(rabbitMq.Exchange)
+            .AcceptMessages<Message, MessageJsonSerializer>(
+                routingKey: static _ => MessageProducer.RoutingKey,
+                configureProperties: static (message, properties) => properties.CorrelationId = message.Id.ToString());
 
-    options.AddQueue<Message>(rabbitMqSettings.Queue)
-        .UseConsumer<MessageConsumer>()
-        .UseDeserializer<MessageDeserializer>();
-});
-
-builder.Services.AddHostedService<InfinitePushMessagesToRabbitMqHostedService>();
-
-builder.Services.AddMetricsAppName(nameof(HowToUse))
-    .AddRabbitMqMetrics();
+        options.AddQueue<Message>(rabbitMq.Queue)
+            .UseDeserializer<MessageJsonSerializer>()
+            .UseConsumer<MessageConsumer>();
+    })
+    // Registered after AddRabbitMq: hosted services start in registration order, the bus is connected by then.
+    .AddHostedService<MessageProducer>();
 
 var app = builder.Build();
+
+app.MapMetrics();
+
 app.Run();
