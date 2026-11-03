@@ -1,17 +1,16 @@
-using System.Threading;
-using System.Threading.Tasks;
 using Coconut.NetCore.RabbitMQ.Core.Events;
 
-namespace Coconut.NetCore.RabbitMQ.Core.Handlers
+namespace Coconut.NetCore.RabbitMQ.Core.Handlers;
+
+/// <summary>
+///     Receives bus events. Handlers are invoked sequentially on the consumer path after ack/nack,
+///     so they add latency to every message: keep them cheap and non-blocking.
+///     Exceptions are logged and swallowed by the bus.
+/// </summary>
+public interface IRabbitMqEventHandler
 {
     /// <summary>
-    ///     RabbitMQ event handler.
+    ///     Handle a bus event.
     /// </summary>
-    public interface IRabbitMqEventHandler
-    {
-        /// <summary>
-        ///     Handles the RabbitMQ events.
-        /// </summary>
-        Task Handle(IRabbitMqEvent @event, CancellationToken cancellationToken = default);
-    }
+    ValueTask HandleAsync(IRabbitMqEvent @event, CancellationToken cancellationToken);
 }

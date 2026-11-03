@@ -1,52 +1,82 @@
-﻿namespace Coconut.NetCore.RabbitMQ.Metrics
+using Prometheus;
+
+namespace Coconut.NetCore.RabbitMQ.Metrics;
+
+/// <summary>
+///     Factory for metrics with the standard static label set (<see cref="DefaultLabels" />).
+///     Metrics are registered in <see cref="Prometheus.Metrics.DefaultRegistry" />; creating a metric with an existing name returns the registered one.
+/// </summary>
+public static class StrictMetrics
 {
     /// <summary>
-    ///     Creates metrics that meet the requirements from the documentation:
-    ///     https://confluence.fbsvc.bz/confluence/display/BPO/Service+Metrics
+    ///     Counter of actions labeled by action name and result (success/failure).
     /// </summary>
-    public static class StrictMetrics
-    {
-        /// <summary>
-        ///     Creates the metric which represent a counter with 'action' and 'result' labels.
-        /// </summary>
-        /// <param name="name">Metric name</param>
-        /// <param name="help">Metric description</param>
-        /// <param name="display">Display name</param>
-        /// <param name="valueType">Type of metric value</param>
-        /// <param name="changeTrackingPeriod">Period of metric change</param>
-        public static ActionMetric Action(
-            string name,
-            string help,
-            string display,
-            MetricValueType valueType,
-            MetricChangeTrackingPeriod changeTrackingPeriod) => new(name, help, display, valueType, changeTrackingPeriod);
+    public static ActionMetric Action(string name, string help, string display, MetricValueType valueType, MetricChangeTrackingPeriod changeTrackingPeriod) =>
+        new(name, help, display, valueType, changeTrackingPeriod);
 
-        /// <summary>
-        ///     Creates the metric which represent a counter with 'total' label.
-        /// </summary>
-        /// <param name="name">Metric name</param>
-        /// <param name="help">Metric description</param>
-        /// <param name="display">Display name</param>
-        /// <param name="valueType">Type of metric value</param>
-        /// <param name="changeTrackingPeriod">Period of metric change</param>
-        public static TotalMetric Total(
-            string name,
-            string help,
-            string display,
-            MetricValueType valueType,
-            MetricChangeTrackingPeriod changeTrackingPeriod) => new(name, help, display, valueType, changeTrackingPeriod);
+    /// <summary>
+    ///     Counter labeled by a <c>total</c> label.
+    /// </summary>
+    public static TotalMetric Total(string name, string help, string display, MetricValueType valueType, MetricChangeTrackingPeriod changeTrackingPeriod) =>
+        new(name, help, display, valueType, changeTrackingPeriod);
 
-        /// <summary>
-        ///     Creates the metric which represent a gauge with 'count' label.
-        /// </summary>
-        /// <param name="name">Metric name</param>
-        /// <param name="help">Metric description</param>
-        /// <param name="display">Display name</param>
-        /// <param name="valueType">Type of metric value</param>
-        public static CountMetric Count(
-            string name,
-            string help,
-            string display,
-            MetricValueType valueType) => new(name, help, display, valueType);
-    }
+    /// <summary>
+    ///     Gauge labeled by a <c>count</c> label.
+    /// </summary>
+    public static CountMetric Count(string name, string help, string display, MetricValueType valueType) =>
+        new(name, help, display, valueType);
+}
+
+/// <summary>
+///     Counter of actions labeled by action name and result.
+/// </summary>
+public sealed class ActionMetric(string name, string help, string display, MetricValueType valueType, MetricChangeTrackingPeriod changeTrackingPeriod)
+{
+    /// <summary>
+    ///     Underlying counter.
+    /// </summary>
+    public Counter Metric { get; } = Prometheus.Metrics
+        .WithLabels(DefaultLabels.GetStaticLabels(display, valueType, changeTrackingPeriod))
+        .CreateCounter(name, help, labelNames: ["action", "result"]);
+
+    /// <summary>
+    ///     Series for an action and its result.
+    /// </summary>
+    public Counter.Child WithLabels(string action, bool success) => Metric.WithLabels(action, success ? "success" : "failure");
+}
+
+/// <summary>
+///     Counter labeled by a <c>total</c> label.
+/// </summary>
+public sealed class TotalMetric(string name, string help, string display, MetricValueType valueType, MetricChangeTrackingPeriod changeTrackingPeriod)
+{
+    /// <summary>
+    ///     Underlying counter.
+    /// </summary>
+    public Counter Metric { get; } = Prometheus.Metrics
+        .WithLabels(DefaultLabels.GetStaticLabels(display, valueType, changeTrackingPeriod))
+        .CreateCounter(name, help, labelNames: ["total"]);
+
+    /// <summary>
+    ///     Series for a label value.
+    /// </summary>
+    public Counter.Child WithLabels(string total) => Metric.WithLabels(total);
+}
+
+/// <summary>
+///     Gauge labeled by a <c>count</c> label.
+/// </summary>
+public sealed class CountMetric(string name, string help, string display, MetricValueType valueType)
+{
+    /// <summary>
+    ///     Underlying gauge.
+    /// </summary>
+    public Gauge Metric { get; } = Prometheus.Metrics
+        .WithLabels(DefaultLabels.GetStaticLabels(display, valueType))
+        .CreateGauge(name, help, labelNames: ["count"]);
+
+    /// <summary>
+    ///     Series for a label value.
+    /// </summary>
+    public Gauge.Child WithLabels(string count) => Metric.WithLabels(count);
 }

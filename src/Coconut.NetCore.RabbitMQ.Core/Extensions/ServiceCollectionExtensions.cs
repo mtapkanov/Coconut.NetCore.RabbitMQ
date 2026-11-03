@@ -1,24 +1,24 @@
+using System.Diagnostics.CodeAnalysis;
 using Coconut.NetCore.RabbitMQ.Core.Handlers;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Coconut.NetCore.RabbitMQ.Core.Extensions
+namespace Coconut.NetCore.RabbitMQ.Core.Extensions;
+
+/// <summary>
+///     DI registration for bus event handlers.
+/// </summary>
+public static class ServiceCollectionExtensions
 {
     /// <summary>
-    ///     RabbitMQ service collection extension methods.
+    ///     Registers a singleton event handler. Registering the same handler type twice has no effect.
     /// </summary>
-    public static class ServiceCollectionExtensions
+    public static IServiceCollection AddRabbitMqEventHandler<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TRabbitMqEventHandler>(this IServiceCollection services)
+        where TRabbitMqEventHandler : class, IRabbitMqEventHandler
     {
-        /// <summary>
-        ///     Adds RabbitMQ message processing event handler to service collection.
-        /// </summary>
-        /// <typeparam name="TRabbitMqEventHandler">Type of handler</typeparam>
-        /// <param name="services">Specifies the contract for a collection of service descriptors</param>
-        /// <returns>Contract for a collection of service descriptors where the RabbitMqBus registered</returns>
-        public static IServiceCollection AddRabbitMqEventHandler<TRabbitMqEventHandler>(this IServiceCollection services)
-            where TRabbitMqEventHandler : class, IRabbitMqEventHandler
-        {
-            services.AddSingleton<IRabbitMqEventHandler, TRabbitMqEventHandler>();
-            return services;
-        }
+        ArgumentNullException.ThrowIfNull(services);
+
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IRabbitMqEventHandler, TRabbitMqEventHandler>());
+        return services;
     }
 }

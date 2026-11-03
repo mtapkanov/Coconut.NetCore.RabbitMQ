@@ -1,44 +1,38 @@
-using System;
-using System.Collections.Generic;
 using Coconut.NetCore.RabbitMQ.Core.Extensions;
 using Coconut.NetCore.RabbitMQ.Metrics.Metrics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Coconut.NetCore.RabbitMQ.Metrics.Extensions
+namespace Coconut.NetCore.RabbitMQ.Metrics.Extensions;
+
+/// <summary>
+///     DI registration for RabbitMQ metrics.
+/// </summary>
+public static class ServiceCollectionExtensions
 {
     /// <summary>
-    ///     RabbitMQ metrics service collection extension methods.
+    ///     Count acknowledged and rejected messages in <c>app_rmq_messages_count_total</c>,
+    ///     labeled by <c>{exchange}.{routingKey}</c> and result.
+    ///     Exposing the <c>/metrics</c> endpoint is up to the application (e.g. prometheus-net.AspNetCore).
     /// </summary>
-    public static class ServiceCollectionExtensions
+    public static IServiceCollection AddRabbitMqMetrics(this IServiceCollection services)
     {
-        /// <summary>
-        ///     Adds RabbitMQ basic metrics.
-        /// </summary>
-        /// <param name="services">Specifies the contract for a collection of service descriptors</param>
-        /// <returns>Contract for a collection of service descriptors where the RabbitMqBus registered</returns>
-        public static IServiceCollection AddRabbitMqMetrics(this IServiceCollection services)
-        {
-            services.TryAddSingleton<NumberOfProcessedRabbitMqMetrics>();
-            return services.AddRabbitMqEventHandler<MetricsRabbitMqEventHandler>();
-        }
+        ArgumentNullException.ThrowIfNull(services);
 
-        /// <summary>
-        ///     Adds label with name 'app' to all metrics. The label contains application name.
-        /// </summary>
-        /// <param name="services">Specifies the contract for a collection of service descriptors</param>
-        /// <param name="applicationName">Application name</param>
-        public static IServiceCollection AddMetricsAppName(this IServiceCollection services, string applicationName)
-        {
-            if (string.IsNullOrEmpty(applicationName))
-                throw new ArgumentNullException(nameof(applicationName));
+        services.TryAddSingleton<NumberOfProcessedRabbitMqMetrics>();
+        return services.AddRabbitMqEventHandler<MetricsRabbitMqEventHandler>();
+    }
 
-            Prometheus.Metrics.DefaultRegistry.SetStaticLabels(new Dictionary<string, string>
-            {
-                ["app"] = applicationName
-            });
+    /// <summary>
+    ///     Set the global <c>app</c> static label on the default Prometheus registry.
+    ///     Must be called before any metric is created, prometheus-net rejects static labels on a registry in use.
+    /// </summary>
+    public static IServiceCollection AddMetricsAppName(this IServiceCollection services, string applicationName)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentException.ThrowIfNullOrEmpty(applicationName);
 
-            return services;
-        }
+        Prometheus.Metrics.DefaultRegistry.SetStaticLabels(new Dictionary<string, string> { ["app"] = applicationName });
+        return services;
     }
 }

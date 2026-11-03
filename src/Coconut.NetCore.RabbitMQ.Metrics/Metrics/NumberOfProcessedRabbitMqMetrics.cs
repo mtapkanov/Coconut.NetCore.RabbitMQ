@@ -1,22 +1,19 @@
-﻿namespace Coconut.NetCore.RabbitMQ.Metrics.Metrics
+namespace Coconut.NetCore.RabbitMQ.Metrics.Metrics;
+
+internal sealed class NumberOfProcessedRabbitMqMetrics
 {
-    internal class NumberOfProcessedRabbitMqMetrics
-    {
-        private readonly ActionMetric _rabbitMqMessagesCountTotal = StrictMetrics.Action(
-            "app_rmq_messages_count_total",
-            "Number of processed RabbitMQ messages.",
-            "RMQ messages",
-            MetricValueType.Integer,
-            MetricChangeTrackingPeriod.PerMinute);
+    public const string Name = "app_rmq_messages_count_total";
 
-        public void IncrementAcknowledgedMessagesCount(string exchange, string routingKey, int increment = 1)
-        {
-            _rabbitMqMessagesCountTotal.WithLabels($"{exchange}.{routingKey}", true).Inc(increment);
-        }
+    private readonly ActionMetric _messagesCountTotal = StrictMetrics.Action(
+        Name,
+        "Number of processed RabbitMQ messages.",
+        "RMQ messages",
+        MetricValueType.Integer,
+        MetricChangeTrackingPeriod.PerMinute);
 
-        public void IncrementRejectedMessagesCount(string exchange, string routingKey, int increment = 1)
-        {
-            _rabbitMqMessagesCountTotal.WithLabels($"{exchange}.{routingKey}", false).Inc(increment);
-        }
-    }
+    public void IncrementAcknowledged(string exchange, string routingKey) =>
+        _messagesCountTotal.WithLabels($"{exchange}.{routingKey}", success: true).Inc();
+
+    public void IncrementRejected(string exchange, string routingKey) =>
+        _messagesCountTotal.WithLabels($"{exchange}.{routingKey}", success: false).Inc();
 }

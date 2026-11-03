@@ -1,20 +1,20 @@
-﻿using System;
+namespace Coconut.NetCore.RabbitMQ.Internal;
 
-namespace Coconut.NetCore.RabbitMQ.Internal
+internal sealed class RabbitMqBus(PublisherRegistry registry) : IRabbitMqBus
 {
-    internal class RabbitMqBus : IRabbitMqBus
+    public ValueTask PublishAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default)
     {
-        private readonly PublisherCache _publisherCache;
+        var publishers = registry.Get<TMessage>();
 
-        public RabbitMqBus(PublisherCache publisherCache)
-        {
-            _publisherCache = publisherCache ?? throw new ArgumentNullException(nameof(publisherCache));
-        }
+        // Common case: one exchange per message type, no async state machine.
+        return publishers.Length == 1
+            ? publishers[0].PublishAsync(message, cancellationToken)
+            : PublishToAllAsync(publishers, message, cancellationToken);
+    }
 
-        public void Publish<TMessage>(TMessage message)
-        {
-            _publisherCache.GetPublishers(typeof(TMessage))
-                .ForEach(publisher => publisher.Publish(message));
-        }
+    private static async ValueTask PublishToAllAsync<TMessage>(IRabbitMqPublisher<TMessage>[] publishers, TMessage message, CancellationToken cancellationToken)
+    {
+        foreach (var publisher in publishers)
+            await publisher.PublishAsync(message, cancellationToken).ConfigureAwait(false);
     }
 }

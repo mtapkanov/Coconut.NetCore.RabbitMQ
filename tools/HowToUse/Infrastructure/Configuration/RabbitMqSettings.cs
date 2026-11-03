@@ -1,13 +1,14 @@
 using Coconut.NetCore.RabbitMQ.Configuration.Settings;
 
-namespace HowToUse.Infrastructure.Configuration
+namespace HowToUse.Infrastructure.Configuration;
+
+public sealed class RabbitMqSettings
 {
-    public class RabbitMqSettings
-    {
-        public Uri BaseUri { get; set; } = null!;
+    public const string SectionName = "RabbitMq";
 
-        public RabbitMqExchangeSettings Exchange { get; set; } = null!;
+    public required Uri BaseUri { get; init; }
 
-        public RabbitMqQueueSettings Queue { get; set; } = null!;
-    }
+    public required RabbitMqExchangeSettings Exchange { get; init; }
+
+    public required RabbitMqQueueSettings Queue { get; init; }
 }

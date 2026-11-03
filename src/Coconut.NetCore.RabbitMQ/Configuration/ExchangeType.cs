@@ -1,28 +1,31 @@
-﻿namespace Coconut.NetCore.RabbitMQ.Configuration
+namespace Coconut.NetCore.RabbitMQ.Configuration;
+
+/// <summary>
+///     AMQP exchange type.
+/// </summary>
+public enum ExchangeType
 {
-    /// <summary>
-    ///     Exchange type <see href="https://www.rabbitmq.com/tutorials/amqp-concepts.html"/>
-    /// </summary>
-    public enum ExchangeType
+    /// <summary>Routes by exact routing key match.</summary>
+    Direct,
+
+    /// <summary>Routes to every bound queue, routing key is ignored.</summary>
+    Fanout,
+
+    /// <summary>Routes by routing key pattern (<c>*</c> - one word, <c>#</c> - zero or more words).</summary>
+    Topic,
+
+    /// <summary>Routes by message headers.</summary>
+    Headers
+}
+
+internal static class ExchangeTypeExtensions
+{
+    public static string ToAmqp(this ExchangeType type) => type switch
     {
-        /// <summary>
-        ///     A direct exchange delivers messages to queues based on the message routing key.
-        /// /// </summary>
-        Direct,
-
-        /// <summary>
-        ///     A fanout exchange routes messages to all of the queues that are bound to it and the routing key is ignored.
-        /// </summary>
-        Fanout,
-
-        /// <summary>
-        ///     Topic exchanges route messages to one or many queues based on matching between a message routing key and the pattern that was used to bind a queue to an exchange.
-        /// </summary>
-        Topic,
-
-        /// <summary>
-        ///     A headers exchange is designed for routing on multiple attributes that are more easily expressed as message headers than a routing key.
-        /// </summary>
-        Headers
-    }
+        ExchangeType.Direct => global::RabbitMQ.Client.ExchangeType.Direct,
+        ExchangeType.Fanout => global::RabbitMQ.Client.ExchangeType.Fanout,
+        ExchangeType.Topic => global::RabbitMQ.Client.ExchangeType.Topic,
+        ExchangeType.Headers => global::RabbitMQ.Client.ExchangeType.Headers,
+        _ => throw new ArgumentOutOfRangeException(nameof(type), type, "Unknown exchange type.")
+    };
 }

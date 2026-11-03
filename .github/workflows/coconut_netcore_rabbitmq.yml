@@ -1,36 +1,46 @@
+# Single pipeline for all three packages. They depend on each other with exact versions,
+# so they are always built, tested and released together from one tag.
 name: Coconut.NetCore.RabbitMQ
-env:
-  ROOT_NAME: "Coconut.NetCore.RabbitMQ"
-  PROJECT_NAME: "Coconut.NetCore.RabbitMQ"
-  VERSION_BY_TAG: "${{ github.ref_name }}"
+
 on:
-  create:
-    tags:
-      - v*.*.*
+  push:
+    branches: [main]
+    tags: ['v*.*.*']
+  pull_request:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup .NET Core
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 6.0.300
-        
-      - name: Restore project
-        run: dotnet restore ${{ env.ROOT_NAME }}.sln
-        
-      - name: Build project
-        run: dotnet build ${{ env.ROOT_NAME }}.sln --no-restore --configuration Release
-        
-      - name: Create nuspec file.
-        run: dotnet publish -p:PackageVersion=${{ env.VERSION_BY_TAG }}
-      
-      - name: Run tests
-        run: dotnet test tests/${{ env.PROJECT_NAME }}.Tests/${{ env.PROJECT_NAME }}.Tests.csproj --no-build
 
-      - name: Publish to github ${{ env.PROJECT_NAME }}
-        run: dotnet nuget push ./src/${{ env.PROJECT_NAME }}/bin/Debug/${{ env.PROJECT_NAME }}.${{ env.VERSION_BY_TAG }}.nupkg -s https://api.nuget.org/v3/index.json -k ${{secrets.NUGET_API_KEY}}
-        
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Resolve version
+        # Tag v2.1.0 -> 2.1.0 (NuGet rejects the leading "v"); other builds get a CI prerelease version.
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+          else
+            echo "VERSION=0.0.0-ci.${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
+          fi
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release -p:Version=${{ env.VERSION }}
+
+      - name: Test
+        run: dotnet test --no-build --configuration Release
+
+      - name: Pack
+        run: dotnet pack --no-build --configuration Release -p:Version=${{ env.VERSION }} --output artifacts
+
+      - name: Push to nuget.org
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: dotnet nuget push "artifacts/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
